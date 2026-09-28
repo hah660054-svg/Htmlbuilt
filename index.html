@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Html Web Maker Pro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Noto+Sans+Myanmar:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #0a0e17;
+            --card-bg: rgba(22, 30, 46, 0.85);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --accent-blue: #0088ff;
+            --accent-cyan: #00f2fe;
+            --accent-gradient: linear-gradient(135deg, #0066ff, #00d4ff);
+            --text-main: #f1f5f9;
+            --text-sub: #94a3b8;
+            --danger: #ff4757;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Pyidaungsu', 'Noto Sans Myanmar', sans-serif;
+            background: #070a10;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 102, 255, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 242, 254, 0.1) 0%, transparent 40%);
+            margin: 0;
+            padding: 20px 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            color: var(--text-main);
+        }
+
+        /* Loading Screen */
+        #loadingScreen {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #070a10;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.4s ease;
+        }
+        .loading-logo {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+        }
+        .spinner {
+            width: 42px;
+            height: 42px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Telegram Overlay */
+        .tg-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(4, 7, 12, 0.92);
+            z-index: 9999;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(12px);
+        }
+        .tg-modal {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 30px 24px;
+            border-radius: 24px;
+            text-align: center;
+            max-width: 90%;
+            width: 360px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+        }
+        .tg-modal h3 { color: var(--accent-cyan); margin-top: 0; font-size: 20px; font-weight: 700; }
+        .tg-modal p { color: var(--text-sub); font-size: 14px; line-height: 1.6; }
+        .tg-join-btn {
+            display: block;
+            background: var(--accent-gradient);
+            color: white;
+            padding: 15px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-weight: 700;
+            margin-top: 25px;
+            font-size: 15px;
+            box-shadow: 0 8px 25px rgba(0, 102, 255, 0.4);
+            transition: transform 0.2s;
+        }
+        .tg-join-btn:active { transform: scale(0.97); }
+
+        .app-container {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 24px;
+            border-radius: 28px;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.7);
+            width: 100%;
+            max-width: 480px;
+            display: none;
+            backdrop-filter: blur(20px);
+        }
+
+        .tg-top-bar {
+            background: rgba(0, 136, 255, 0.1);
+            border: 1px solid rgba(0, 136, 255, 0.2);
+            color: var(--accent-cyan);
+            padding: 12px;
+            border-radius: 14px;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 24px;
+            word-break: break-all;
+        }
+        .tg-top-bar a { color: #fff; text-decoration: underline; margin-left: 5px; }
+
+        /* Views */
+        .view-section { display: none; }
+        .view-section.active { display: block; animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Home Menu Styles */
+        .home-menu { text-align: center; }
+        .home-menu h2 {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #ffffff, #a5b4fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .menu-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 18px;
+            margin-bottom: 16px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s ease;
+        }
+        .menu-btn:active { transform: scale(0.98); }
+        .btn-create {
+            background: var(--accent-gradient);
+            color: white;
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.35);
+        }
+        .btn-projects {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+        }
+        .btn-projects:hover { background: rgba(255, 255, 255, 0.08); }
+
+        /* PAGE SELECTION VIEW (Matching exact user screenshot request) */
+        .page-select-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            color: var(--text-main);
+        }
+        .page-vertical-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .page-select-btn {
+            width: 80%;
+            max-width: 280px;
+            padding: 16px;
+            background: linear-gradient(135deg, #38bdf8, #0284c7);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(2, 132, 199, 0.3);
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+        .page-select-btn:active {
+            transform: scale(0.95);
+            filter: brightness(1.1);
+        }
+
+        /* Editor Section */
+        h2 { color: var(--text-main); text-align: center; margin-top: 0; margin-bottom: 20px; font-weight: 700; font-size: 20px; }
+        label { font-weight: 600; color: var(--text-sub); display: block; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        
+        .edit-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 6px; }
+        .tab-btn {
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-sub);
+            border-radius: 12px;
+            cursor: pointer;
+            white-space: nowrap;
+            font-size: 13px;
+            font-weight: 600;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--accent-gradient);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(0, 102, 255, 0.3);
+        }
+
+        .editor-box {
+            background: rgba(0, 0, 0, 0.25);
+            padding: 20px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+            border: 1px solid var(--card-border);
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            color: var(--text-main);
+            box-sizing: border-box;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        input[type="text"]:focus, textarea:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+        .checkbox-group input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent-blue); }
+        .checkbox-group label { margin: 0; font-size: 14px; text-transform: none; letter-spacing: 0; color: var(--text-main); }
+        .btn-text-input { margin-bottom: 16px !important; }
+
+        .reject-fields-box {
+            background: rgba(255, 71, 87, 0.08);
+            border: 1px dashed rgba(255, 71, 87, 0.3);
+            padding: 16px;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .color-picker-wrapper { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
+        input[type="color"] { border: none; width: 50px; height: 42px; border-radius: 10px; background: none; cursor: pointer; }
+
+        .action-box { display: flex; gap: 10px; margin-top: 15px; }
+        .build-btn {
+            flex: 2;
+            padding: 15px;
+            background: var(--accent-gradient);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 102, 255, 0.3);
+            font-family: inherit;
+        }
+        .back-menu-btn {
+            flex: 1;
+            padding: 15px;
+            background: rgba(255, 71, 87, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(255, 71, 87, 0.3);
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        /* Projects List */
+        .project-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .project-header { display: flex; justify-content: space-between; align-items: center; }
+        .project-title { font-weight: 700; color: var(--accent-cyan); font-size: 16px; }
+        .project-date { font-size: 12px; color: var(--text-sub); }
+        .project-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .p-btn {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: opacity 0.2s;
+        }
+        .p-btn-view { background: var(--accent-blue); color: white; }
+        .p-btn-share { background: rgba(255, 255, 255, 0.1); color: white; }
+        .p-btn-download { background: var(--success); color: white; }
+        .p-btn-delete { background: rgba(255, 71, 87, 0.2); color: var(--danger); }
+        .no-projects { text-align: center; color: var(--text-sub); padding: 40px 10px; font-size: 14px; }
+
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .nav-back-icon {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 8px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Loading Screen -->
+<div id="loadingScreen">
+    <div class="loading-logo">Royald Pro</div>
+    <div class="spinner"></div>
+</div>
+
+<!-- Telegram Overlay -->
+<div id="tgOverlay" class="tg-overlay">
+    <div class="tg-modal">
+        <h3>📢 Telegram Channel Join ရန်</h3>
+        <p>အက်ပ်ကို အသုံးပြုနိုင်ရန် Telegram Channel သို့ အရင်ဆုံး Join ပေးပါနော်။</p>
+        <p style="font-size: 12px; color: var(--text-sub);">(ပထမတစ်ကြိမ်သာ တောင်းဆိုခြင်းဖြစ်သည်)</p>
+        <a href="https://t.me/robloxhackingchannal" target="_blank" class="tg-join-btn" onclick="unlockApp()">Join Channel 🚀</a>
+    </div>
+</div>
+
+<div class="app-container" id="appContainer">
+    <div class="tg-top-bar">
+        my tg channal - <a href="https://t.me/robloxhackingchannal" target="_blank">https://t.me/robloxhackingchannal</a>
+    </div>
+
+    <!-- 1. HOME MENU VIEW -->
+    <div id="viewHome" class="view-section active">
+        <div class="home-menu">
+            <h2>HTML Web Maker 🛠️</h2>
+            <p style="color: var(--text-sub); margin-bottom: 30px; font-size: 14px;">လိုချင်သော ဝက်ဘ်ဆိုက်များကို စတိုင်ကျကျ ဖန်တီးပြီး သိမ်းဆည်းပါ။</p>
+            
+            <button class="menu-btn btn-create" onclick="switchView('viewPageSelect')">✨ ဝက်ဘ်ဆိုက်အသစ် ဖန်တီးမည် (HTML Maker)</button>
+            <button class="menu-btn btn-projects" onclick="switchView('viewProjects')">📂 သိမ်းဆည်းထားသော Projects များ</button>
+        </div>
+    </div>
+
+    <!-- 2. PAGE SELECTION VIEW (Matches User Screenshot) -->
+    <div id="viewPageSelect" class="view-section">
+        <div class="nav-header">
+            <button class="nav-back-icon" onclick="switchView('viewHome')">⬅️ မီနူး</button>
+            <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Page အရေအတွက် ရွေးပါ</h3>
+            <div style="width: 60px;"></div>
+        </div>
+
+        <div class="page-vertical-list">
+            <button class="page-select-btn" onclick="selectPageCountAndBuild(1)">1 Page</button>
+            <button class="page-select-btn" onclick="selectPageCountAndBuild(2)">2 Page</button>
+            <button class="page-select-btn" onclick="selectPageCountAndBuild(3)">3 Page</button>
+            <button class="page-select-btn" onclick="selectPageCountAndBuild(4)">4 Page</button>
+            <button class="page-select-btn" onclick="selectPageCountAndBuild(5)">5 Page</button>
+            <button class="page-select-btn" onclick="selectPageCountAndBuild(6)">6 Page</button>
+            <button class="page-select-btn" onclick="selectPageCountAndBuild(7)">7 Page</button>
+        </div>
+    </div>
+
+    <!-- 3. BUILDER VIEW -->
+    <div id="viewBuilder" class="view-section">
+        <div class="nav-header">
+            <button class="nav-back-icon" onclick="switchView('viewPageSelect')">⬅️ စာမျက်နှာပြင်မည်</button>
+            <h2 style="margin:0; font-size: 18px;">Html Editor ⚙️</h2>
+            <div style="width: 70px;"></div>
+        </div>
+
+        <label>ပြင်ဆင်လိုသည့် စာမျက်နှာကို ရွေးပါ</label>
+        <div class="edit-tabs" id="editTabsContainer"></div>
+
+        <div class="editor-box">
+            <h3 id="currentEditingTitle" style="margin-top:0; color: var(--accent-cyan); font-size:15px; margin-bottom:15px;">Page 1 ကို ပြင်ဆင်နေသည်</h3>
+            
+            <label>ခေါင်းစဉ် (Heading)</label>
+            <input type="text" id="webHeadingInput" oninput="saveCurrentPageData()" placeholder="ဒီစာမျက်နှာအတွက် ခေါင်းစဉ်...">
+            
+            <label>ပုံလင့်ခ် (📸 Image URL)</label>
+            <input type="text" id="webImgInput" oninput="saveCurrentPageData()" placeholder="https://site.com/image.jpg">
+
+            <label>စာကိုယ် (Body Text)</label>
+            <textarea id="webBodyInput" rows="3" oninput="saveCurrentPageData()" placeholder="ပြသချင်သည့် စာသားများ..."></textarea>
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="showBackCheck" onchange="saveCurrentPageData()">
+                <label for="showBackCheck">⬅️ နောက်သို့ပြန်သည့်ခလုတ် (Back)</label>
+            </div>
+            <input type="text" id="backBtnTextInput" class="btn-text-input" oninput="saveCurrentPageData()" placeholder="ခလုတ်စာသား (ဥပမာ - ⬅️ နောက်သို့)">
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="showNextCheck" onchange="saveCurrentPageData()">
+                <label for="showNextCheck">➡️ ရှေ့သို့သွားသည့်ခလုတ် (Next)</label>
+            </div>
+            <input type="text" id="nextBtnTextInput" class="btn-text-input" oninput="saveCurrentPageData()" placeholder="ခလုတ်စာသား (ဥပမာ - ရှေ့သို့ ➡️)">
+
+            <div class="checkbox-group">
+                <input type="checkbox" id="showRejectCheck" onchange="toggleRejectUI()">
+                <label for="showRejectCheck">❌ Reject ခလုတ် စနစ်ထည့်မည်</label>
+            </div>
+
+            <div class="reject-fields-box" id="rejectFieldsBox">
+                <label style="color: var(--danger);">Reject ခလုတ် စာသား</label>
+                <input type="text" id="rejBtnTextInput" oninput="saveCurrentPageData()" placeholder="ခလုတ်ပေါ်က စာသား (ဥပမာ - ငြင်းမည် ❌)">
+                
+                <label style="color: var(--danger); font-size:11px;">ငြင်းပါက အစဉ်လိုက် ပေါ်လာမည့် စာများ</label>
+                <input type="text" id="rejText1" oninput="saveCurrentPageData()" placeholder="၁ ကြိမ်မြောက်နှိပ်ရင် ပေါ်မည့်စာ...">
+                <input type="text" id="rejText2" oninput="saveCurrentPageData()" placeholder="၂ ကြိမ်မြောက်နှိပ်ရင် ပေါ်မည့်စာ...">
+                <input type="text" id="rejText3" oninput="saveCurrentPageData()" placeholder="၃ ကြိမ်မြောက်နှိပ်ရင် ပေါ်မည့်စာ...">
+            </div>
+        </div>
+
+        <label>ဝက်ဘ်ဆိုက် နောက်ခံအရောင်</label>
+        <div class="color-picker-wrapper">
+            <input type="color" id="bgColor" value="#0f172a" onchange="saveGlobalSettings()">
+            <span style="color: var(--text-sub); font-size: 13px;">(Theme Color ရွေးပါ)</span>
+        </div>
+
+        <label>နောက်ခံတွင် Floating ပြုလုပ်မည့် Emoji / Icon</label>
+        <input type="text" id="bgEmoji" value="✨" oninput="saveGlobalSettings()" placeholder="ဥပမာ - ✨, 🚀, 💻">
+
+        <label>Project အမည်</label>
+        <input type="text" id="projectNameInput" value="My Web Project" placeholder="Project အမည်...">
+
+        <div class="action-box">
+            <button class="back-menu-btn" onclick="resetAllData()">အကုန်ဖျက်မည် 🗑️</button>
+            <button class="build-btn" onclick="saveProjectToBuilder()">📁 Save Project</button>
+        </div>
+    </div>
+
+    <!-- 4. PROJECTS VIEW -->
+    <div id="viewProjects" class="view-section">
+        <div class="nav-header">
+            <button class="nav-back-icon" onclick="switchView('viewHome')">⬅️ မီနူး</button>
+            <h2 style="margin:0; font-size: 18px;">Saved Projects 📂</h2>
+            <div style="width: 60px;"></div>
+        </div>
+
+        <p style="color:var(--text-sub); font-size:13px; text-align:center; margin-bottom:18px;">သိမ်းဆည်းထားသော ဖိုင်များကို စမ်းသပ်၊ ဒေါင်းလုဒ်လုပ်ပြီး မျှဝေနိုင်ပါသည်</p>
+
+        <div id="projectsListContainer"></div>
+    </div>
+</div>
+
+<script>
+let pagesData = [];
+let totalPages = 1; 
+let currentEditPage = 1; 
+
+const defaultPagesData = [
+    { heading: "Welcome to Page 1", imgUrl: "", body: "ဒီမှာ ပထမဆုံး စာမျက်နှာ အချက်အလက်များ ရေးပါ။", showBack: true, showNext: true, showReject: false, backText: "⬅️ နောက်သို့", nextText: "ရှေ့သို့ ➡️", rejText: "ငြင်းမည် ❌", rej1: "", rej2: "", rej3: "" },
+    { heading: "Welcome to Page 2", imgUrl: "", body: "ဒုတိယ စာမျက်နှာ ဖြစ်ပါတယ်။", showBack: true, showNext: true, showReject: false, backText: "⬅️ နောက်သို့", nextText: "ရှေ့သို့ ➡️", rejText: "ငြင်းမည် ❌", rej1: "", rej2: "", rej3: "" },
+    { heading: "Welcome to Page 3", imgUrl: "", body: "တတိယ စာမျက်နှာ ဖြစ်ပါတယ်။", showBack: true, showNext: true, showReject: false, backText: "⬅️ နောက်သို့", nextText: "ရှေ့သို့ ➡️", rejText: "ငြင်းမည် ❌", rej1: "", rej2: "", rej3: "" },
+    { heading: "Welcome to Page 4", imgUrl: "", body: "စတုတ္ထ စာမျက်နှာ ဖြစ်ပါတယ်။", showBack: true, showNext: true, showReject: false, backText: "⬅️ နောက်သို့", nextText: "ရှေ့သို့ ➡️", rejText: "ငြင်းမည် ❌", rej1: "", rej2: "", rej3: "" },
+    { heading: "Welcome to Page 5", imgUrl: "", body: "ပဉ္စမ စာမျက်နှာ ဖြစ်ပါတယ်။", showBack: true, showNext: true, showReject: false, backText: "⬅️ နောက်သို့", nextText: "ရှေ့သို့ ➡️", rejText: "ငြင်းမည် ❌", rej1: "", rej2: "", rej3: "" },
+    { heading: "Welcome to Page 6", imgUrl: "", body: "ဆဋ္ဌမ စာမျက်နှာ ဖြစ်ပါတယ်။", showBack: true, showNext: true, showReject: false, backText: "⬅️ နောက်သို့", nextText: "ရှေ့သို့ ➡️", rejText: "ငြင်းမည် ❌", rej1: "", rej2: "", rej3: "" },
+    { heading: "Welcome to Page 7", imgUrl: "", body: "သတ္တမ စာမျက်နှာ ဖြစ်ပါတယ်။", showBack: true, showNext: true, showReject: false, backText: "⬅️ နောက်သို့", nextText: "ရှေ့သို့ ➡️", rejText: "ငြင်းမည် ❌", rej1: "", rej2: "", rej3: "" }
+];
+
+window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+        const loader = document.getElementById('loadingScreen');
+        loader.style.opacity = '0';
+        setTimeout(() => {
+            loader.style.display = 'none';
+            document.getElementById('appContainer').style.display = 'block';
+            initApp();
+        }, 400);
+    }, 1200);
+});
+
+function initApp() {
+    if (localStorage.getItem('hwm_tg_joined') === 'true') {
+        document.getElementById('tgOverlay').style.display = 'none';
+    } else {
+        document.getElementById('tgOverlay').style.display = 'flex';
+    }
+
+    const savedData = localStorage.getItem('hwm_pagesData_v8');
+    if (savedData) {
+        pagesData = JSON.parse(savedData);
+    } else {
+        pagesData = JSON.parse(JSON.stringify(defaultPagesData));
+    }
+
+    totalPages = parseInt(localStorage.getItem('hwm_totalPages')) || 1;
+    document.getElementById('bgColor').value = localStorage.getItem('hwm_bgColor') || "#0f172a";
+    document.getElementById('bgEmoji').value = localStorage.getItem('hwm_bgEmoji') || "✨";
+    document.getElementById('projectNameInput').value = localStorage.getItem('hwm_projectName') || "My Web Project";
+
+    updateTabs();
+    loadPageDataIntoEditor();
+    loadProjectsList();
+}
+
+function unlockApp() {
+    localStorage.setItem('hwm_tg_joined', 'true');
+    setTimeout(() => { document.getElementById('tgOverlay').style.display = 'none'; }, 1000);
+}
+
+function switchView(viewId) {
+    document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+    document.getElementById(viewId).classList.add('active');
+    if(viewId === 'viewProjects') {
+        loadProjectsList();
+    }
+}
+
+/* User selects 1 Page to 7 Page from vertical list (User Screenshot) */
+function selectPageCountAndBuild(num) {
+    totalPages = num;
+    localStorage.setItem('hwm_totalPages', num);
+    currentEditPage = 1;
+    updateTabs();
+    loadPageDataIntoEditor();
+    switchView('viewBuilder');
+}
+
+function updateTabs() {
+    const container = document.getElementById('editTabsContainer');
+    container.innerHTML = "";
+    for (let i = 1; i <= totalPages; i++) {
+        const btn = document.createElement('button');
+        btn.classList.add('tab-btn');
+        if (i === currentEditPage) btn.classList.add('active');
+        btn.innerText = `Page ${i}`;
+        btn.onclick = function() { changeEditTab(i); };
+        container.appendChild(btn);
+    }
+}
+
+function changeEditTab(pageNumber) {
+    saveCurrentPageData(); 
+    currentEditPage = pageNumber;
+    updateTabs();
+    loadPageDataIntoEditor();
+}
+
+function saveCurrentPageData() {
+    if(pagesData.length === 0) return;
+    let idx = currentEditPage - 1;
+    pagesData[idx].heading = document.getElementById('webHeadingInput').value;
+    pagesData[idx].imgUrl = document.getElementById('webImgInput').value;
+    pagesData[idx].body = document.getElementById('webBodyInput').value;
+    pagesData[idx].showBack = document.getElementById('showBackCheck').checked;
+    pagesData[idx].backText = document.getElementById('backBtnTextInput').value;
+    pagesData[idx].showNext = document.getElementById('showNextCheck').checked;
+    pagesData[idx].nextText = document.getElementById('nextBtnTextInput').value;
+    pagesData[idx].showReject = document.getElementById('showRejectCheck').checked;
+    pagesData[idx].rejText = document.getElementById('rejBtnTextInput').value;
+    pagesData[idx].rej1 = document.getElementById('rejText1').value;
+    pagesData[idx].rej2 = document.getElementById('rejText2').value;
+    pagesData[idx].rej3 = document.getElementById('rejText3').value;
+    
+    localStorage.setItem('hwm_pagesData_v8', JSON.stringify(pagesData));
+}
+
+function toggleRejectUI() {
+    const isChecked = document.getElementById('showRejectCheck').checked;
+    document.getElementById('rejectFieldsBox').style.display = isChecked ? 'block' : 'none';
+    saveCurrentPageData();
+}
+
+function saveGlobalSettings() {
+    localStorage.setItem('hwm_bgColor', document.getElementById('bgColor').value);
+    localStorage.setItem('hwm_bgEmoji', document.getElementById('bgEmoji').value);
+    localStorage.setItem('hwm_projectName', document.getElementById('projectNameInput').value);
+}
+
+function loadPageDataIntoEditor() {
+    if(pagesData.length === 0) return;
+    let idx = currentEditPage - 1;
+    document.getElementById('currentEditingTitle').innerText = `Page ${currentEditPage} ကို ပြင်ဆင်နေသည်`;
+    document.getElementById('webHeadingInput').value = pagesData[idx].heading || "";
+    document.getElementById('webImgInput').value = pagesData[idx].imgUrl || "";
+    document.getElementById('webBodyInput').value = pagesData[idx].body || "";
+    
+    document.getElementById('showBackCheck').checked = pagesData[idx].showBack !== false;
+    document.getElementById('backBtnTextInput').value = pagesData[idx].backText || "⬅️ နောက်သို့";
+    document.getElementById('showNextCheck').checked = pagesData[idx].showNext !== false;
+    document.getElementById('nextBtnTextInput').value = pagesData[idx].nextText || "ရှေ့သို့ ➡️";
+    document.getElementById('showRejectCheck').checked = pagesData[idx].showReject || false;
+    document.getElementById('rejBtnTextInput').value = pagesData[idx].rejText || "ငြင်းမည် ❌";
+    document.getElementById('rejText1').value = pagesData[idx].rej1 || "";
+    document.getElementById('rejText2').value = pagesData[idx].rej2 || "";
+    document.getElementById('rejText3').value = pagesData[idx].rej3 || "";
+
+    document.getElementById('rejectFieldsBox').style.display = pagesData[idx].showReject ? 'block' : 'none';
+}
+
+function resetAllData() {
+    if(confirm("အကုန်ဖျက်ပြီး အစကပြန်စမှာ သေချာပါသလား?")) {
+        localStorage.clear();
+        initApp();
+    }
+}
+
+function generateHTMLString() {
+    saveCurrentPageData(); 
+    saveGlobalSettings();
+    const bgColor = document.getElementById('bgColor').value;
+    const bgEmoji = document.getElementById('bgEmoji').value || "✨";
+    let pagesHTMLContent = "";
+
+    for (let i = 0; i < totalPages; i++) {
+        const pageNum = i + 1;
+        const pData = pagesData[i];
+        const heading = pData.heading || `Page ${pageNum}`;
+        const imgUrl = pData.imgUrl || "";
+        const body = pData.body || "";
+        const isActive = (i === 0) ? "active" : ""; 
+
+        let imgTag = imgUrl ? `<img src="${imgUrl}" class="web-img" alt="image">` : "";
+
+        let rejectLines = "";
+        if(pData.showReject) {
+            rejectLines = `
+            <div class="reject-container">
+                <p id="rej_l_${pageNum}_1" class="rej-line-text">${pData.rej1 || '...'}</p>
+                <p id="rej_l_${pageNum}_2" class="rej-line-text">${pData.rej2 || '...'}</p>
+                <p id="rej_l_${pageNum}_3" class="rej-line-text">${pData.rej3 || '...'}</p>
+            </div>`;
+        }
+
+        let navigationButtons = `<div class="nav-box">`;
+        
+        if (i > 0 && pData.showBack !== false) {
+            navigationButtons += `<button class="nav-btn back" onclick="goToPage(${pageNum - 1})">${pData.backText || '⬅️ နောက်သို့'}</button>`;
+        }
+        
+        if (pData.showReject) {
+            navigationButtons += `<button id="rej_btn_${pageNum}" class="nav-btn reject" onclick="clickRejectBtn(${pageNum})">${pData.rejText || 'ငြင်းမည် ❌'}</button>`;
+        }
+        
+        if (pData.showNext !== false && pageNum < totalPages) {
+            navigationButtons += `<button id="next_btn_${pageNum}" class="nav-btn next" onclick="goToPage(${pageNum + 1})">${pData.nextText || 'ရှေ့သို့ ➡️'}</button>`;
+        }
+        
+        navigationButtons += `</div>`;
+
+        pagesHTMLContent += `
+    <div id="page_${pageNum}" class="web-page-card ${isActive}">
+        <h1>${heading}</h1>
+        ${imgTag}
+        <p>${body}</p>
+        ${rejectLines}
+        ${navigationButtons}
+    </div>`;
+    }
+
+    return `<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated App Web</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { margin: 0; padding: 0; background-color: ${bgColor}; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Pyidaungsu', 'Noto Sans Myanmar', sans-serif; overflow: hidden; position: relative; }
+        .web-page-card { background: rgba(18, 26, 41, 0.92); color: #f1f5f9; border: 1px solid rgba(255,255,255,0.1); padding: 32px 24px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; backdrop-filter: blur(10px); max-width: 90%; width: 380px; z-index: 10; display: none; box-sizing: border-box; animation: fadeIn 0.4s ease-in-out; }
+        .web-page-card.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        h1 { color: #00f2fe; margin-top: 0; margin-bottom: 16px; font-size: 22px; font-weight: 700; }
+        .web-img { max-width: 100%; max-height: 180px; border-radius: 14px; margin-bottom: 16px; object-fit: cover; }
+        p { color: #cbd5e1; font-size: 15px; line-height: 1.7; margin-bottom: 24px; white-space: pre-wrap; }
+        .rej-line-text { color: #ff4757; font-weight: bold; font-size: 14px; margin: 8px 0; display: none; background: rgba(255,71,87,0.12); padding: 10px; border-radius: 10px; animation: fadeIn 0.3s; }
+        .nav-box { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+        .nav-btn { padding: 14px 20px; font-size: 14px; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; transition: 0.2s; flex: 1; min-width: 100px; font-family: inherit; }
+        .next { background: linear-gradient(135deg, #0066ff, #00d4ff); color: white; box-shadow: 0 6px 18px rgba(0,102,255,0.35); }
+        .back { background-color: rgba(255,255,255,0.1); color: #f1f5f9; }
+        .reject { background-color: #ff4757; color: white; box-shadow: 0 6px 18px rgba(255,71,87,0.35); }
+        .floating-emoji { position: absolute; pointer-events: none; animation: floatUp linear infinite; bottom: -50px; opacity: 0.5; z-index: 1; }
+        @keyframes floatUp { 0% { transform: translateY(0) rotate(0deg); opacity: 0.7; } 100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; } }
+    </style>
+</head>
+<body>
+    ${pagesHTMLContent}
+    <script>
+        function goToPage(pageNumber) {
+            document.querySelectorAll('.web-page-card').forEach(p => p.classList.remove('active'));
+            const targetPage = document.getElementById('page_' + pageNumber);
+            if(targetPage) targetPage.classList.add('active');
+        }
+
+        let rejectClicks = {};
+        function clickRejectBtn(pageNum) {
+            if(!rejectClicks[pageNum]) rejectClicks[pageNum] = 0;
+            rejectClicks[pageNum]++;
+            let count = rejectClicks[pageNum];
+            if(count <= 3) {
+                let targetLine = document.getElementById('rej_l_' + pageNum + '_' + count);
+                if(targetLine) targetLine.style.display = 'block';
+            }
+        }
+
+        const emojiSource = "${bgEmoji}";
+        const emojis = Array.from(emojiSource);
+        function createEmoji() {
+            if(emojis.length === 0) return;
+            const emojiDiv = document.createElement('div');
+            emojiDiv.classList.add('floating-emoji');
+            emojiDiv.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+            emojiDiv.style.left = Math.random() * 100 + 'vw';
+            emojiDiv.style.animationDuration = Math.random() * 3 + 4 + 's';
+            emojiDiv.style.fontSize = Math.random() * 20 + 20 + 'px';
+            document.body.appendChild(emojiDiv);
+            setTimeout(() => { emojiDiv.remove(); }, 7000);
+        }
+        if(emojis.length > 0) setInterval(createEmoji, 600);
+    <\/script>
+</body>
+</html>`;
+}
+
+function saveProjectToBuilder() {
+    const htmlContent = generateHTMLString();
+    const projName = document.getElementById('projectNameInput').value.trim() || "My Web Project";
+    const dateStr = new Date().toLocaleString();
+
+    let projects = JSON.parse(localStorage.getItem('hwm_saved_projects') || '[]');
+    
+    projects.unshift({
+        id: 'proj_' + Date.now(),
+        name: projName,
+        date: dateStr,
+        html: htmlContent
+    });
+
+    localStorage.setItem('hwm_saved_projects', JSON.stringify(projects));
+    alert("✅ Project ကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ!");
+    switchView('viewProjects');
+}
+
+function loadProjectsList() {
+    const container = document.getElementById('projectsListContainer');
+    let projects = JSON.parse(localStorage.getItem('hwm_saved_projects') || '[]');
+
+    if(projects.length === 0) {
+        container.innerHTML = `<div class="no-projects">သိမ်းဆည်းထားသော Projects များ မရှိသေးပါ။<br>ဝက်ဘ်ဆိုက်အသစ် စတင်ဖန်တီးပါ။</div>`;
+        return;
+    }
+
+    let html = "";
+    projects.forEach(p => {
+        html += `
+        <div class="project-item">
+            <div class="project-header">
+                <span class="project-title">🌐 ${escapeHtml(p.name)}</span>
+                <span class="project-date">${p.date}</span>
+            </div>
+            <div class="project-actions">
+                <button class="p-btn p-btn-view" onclick="previewProject('${p.id}')">👀 ကြည့်မည်</button>
+                <button class="p-btn p-btn-share" onclick="shareProject('${p.id}')">🔗 ရှယ်မည်</button>
+                <button class="p-btn p-btn-download" onclick="downloadProject('${p.id}')">📥 Download</button>
+                <button class="p-btn p-btn-delete" onclick="deleteProject('${p.id}')">🗑️ ဖျက်မည်</button>
+            </div>
+        </div>`;
+    });
+    container.innerHTML = html;
+}
+
+function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+}
+
+function previewProject(id) {
+    let projects = JSON.parse(localStorage.getItem('hwm_saved_projects') || '[]');
+    let proj = projects.find(p => p.id === id);
+    if(proj) {
+        const win = window.open();
+        win.document.write(proj.html);
+        win.document.close();
+    }
+}
+
+function downloadProject(id) {
+    let projects = JSON.parse(localStorage.getItem('hwm_saved_projects') || '[]');
+    let proj = projects.find(p => p.id === id);
+    if(proj) {
+        const blob = new Blob([proj.html], { type: "text/html" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = (proj.name.replace(/[^a-zA-Z0-9]/g, '_')) + ".html";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+}
+
+function shareProject(id) {
+    let projects = JSON.parse(localStorage.getItem('hwm_saved_projects') || '[]');
+    let proj = projects.find(p => p.id === id);
+    if(proj) {
+        if(navigator.share) {
+            const file = new File([proj.html], (proj.name + ".html"), { type: "text/html" });
+            navigator.share({
+                title: proj.name,
+                text: 'ကျွန်ုပ်ဖန်တီးထားသော ဝက်ဘ်ဆိုက်ဖိုင်ကို ကြည့်ရှုပါ!',
+                files: [file]
+            }).catch(err => {
+                copyTextToClipboard(proj.html);
+            });
+        } else {
+            copyTextToClipboard(proj.html);
+        }
+    }
+}
+
+function copyTextToClipboard(text) {
+    const blob = new Blob([text], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    prompt("ဖိုင်လင့်ခ် သို့မဟုတ် HTML ကုဒ်ကို ကူးယူပါ -", url);
+}
+
+function deleteProject(id) {
+    if(confirm("ဤ Project ကို ဖျက်မှာ သေချာပါသလား?")) {
+        let projects = JSON.parse(localStorage.getItem('hwm_saved_projects') || '[]');
+        projects = projects.filter(p => p.id !== id);
+        localStorage.setItem('hwm_saved_projects', JSON.stringify(projects));
+        loadProjectsList();
+    }
+}
+</script>
+
+</body>
+</html>
