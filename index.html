@@ -184,13 +184,6 @@
         .btn-projects:hover { background: rgba(255, 255, 255, 0.08); }
 
         /* PAGE SELECTION VIEW */
-        .page-select-title {
-            text-align: center;
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 24px;
-            color: var(--text-main);
-        }
         .page-vertical-list {
             display: flex;
             flex-direction: column;
@@ -215,11 +208,9 @@
         }
         .page-select-btn:active {
             transform: scale(0.95);
-            filter: brightness(1.1);
         }
 
         /* Editor Section */
-        h2 { color: var(--text-main); text-align: center; margin-top: 0; margin-bottom: 20px; font-weight: 700; font-size: 20px; }
         label { font-weight: 600; color: var(--text-sub); display: block; margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
         
         .edit-tabs { display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 6px; }
@@ -368,6 +359,15 @@
             font-size: 13px;
             font-weight: 600;
         }
+
+        /* In-App Preview Frame */
+        #previewFrame {
+            width: 100%;
+            height: calc(100vh - 120px);
+            border: none;
+            border-radius: 18px;
+            background: #fff;
+        }
     </style>
 </head>
 <body>
@@ -480,6 +480,9 @@
             <span style="color: var(--text-sub); font-size: 13px;">(Theme Color ရွေးပါ)</span>
         </div>
 
+        <label>🖼️ နောက်ခံပုံ လင့်ခ် (Background Image URL)</label>
+        <input type="text" id="bgImgInput" oninput="saveGlobalSettings()" placeholder="https://site.com/background.jpg (မထည့်လည်းရသည်)">
+
         <label>နောက်ခံတွင် Floating ပြုလုပ်မည့် Emoji / Icon</label>
         <input type="text" id="bgEmoji" value="✨" oninput="saveGlobalSettings()" placeholder="ဥပမာ - ✨, 🚀, 💻">
 
@@ -503,6 +506,16 @@
         <p style="color:var(--text-sub); font-size:13px; text-align:center; margin-bottom:18px;">သိမ်းဆည်းထားသော ဖိုင်များကို စမ်းသပ်၊ ဒေါင်းလုဒ်လုပ်ပြီး မျှဝေနိုင်ပါသည်</p>
 
         <div id="projectsListContainer"></div>
+    </div>
+
+    <!-- 5. PREVIEW VIEW (In-App Preview for Back Button Support) -->
+    <div id="viewPreview" class="view-section">
+        <div class="nav-header">
+            <button class="nav-back-icon" onclick="goBackUI()">⬅️ ပြန်ထွက်မည်</button>
+            <h2 style="margin:0; font-size: 16px; color: var(--accent-cyan);">Live Preview 👀</h2>
+            <div style="width: 60px;"></div>
+        </div>
+        <iframe id="previewFrame"></iframe>
     </div>
 </div>
 
@@ -549,10 +562,10 @@ function initApp() {
 
     totalPages = parseInt(localStorage.getItem('hwm_totalPages')) || 1;
     document.getElementById('bgColor').value = localStorage.getItem('hwm_bgColor') || "#0f172a";
+    document.getElementById('bgImgInput').value = localStorage.getItem('hwm_bgImg') || "";
     document.getElementById('bgEmoji').value = localStorage.getItem('hwm_bgEmoji') || "✨";
     document.getElementById('projectNameInput').value = localStorage.getItem('hwm_projectName') || "My Web Project";
 
-    // ဖုန်းကနေ Back ပြန်ထွက်တာကို Control လုပ်ရန် (အစမှတ် နေရာသတ်မှတ်ခြင်း)
     history.replaceState({ viewId: 'viewHome' }, "", "#viewHome");
 
     updateTabs();
@@ -565,7 +578,6 @@ function unlockApp() {
     setTimeout(() => { document.getElementById('tgOverlay').style.display = 'none'; }, 1000);
 }
 
-// History အဝင်/အထွက်ကို ထိန်းချုပ်မည့် Function အသစ်
 function switchView(viewId, isBackEvent = false) {
     document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
     document.getElementById(viewId).classList.add('active');
@@ -573,26 +585,22 @@ function switchView(viewId, isBackEvent = false) {
         loadProjectsList();
     }
     
-    // ဖုန်း Back လိုမျိုး ခလုပ်ကနေ လာတာမဟုတ်ရင် History အသစ်ကို သိမ်းမယ်
     if (!isBackEvent) {
         history.pushState({ viewId: viewId }, "", "#" + viewId);
     }
 }
 
-// အက်ပ်ထဲက "⬅️" ခလုပ်ကို နှိပ်တဲ့အခါ အလုပ်လုပ်မည့် Function
 function goBackUI() {
-    history.back(); // ဖုန်း Back ကို နှိပ်သလိုပဲ အလုပ်လုပ်စေသည်
+    history.back();
 }
 
-// ဖုန်းရဲ့ Back ခလုပ်ကို နှိပ်လိုက်တဲ့အခါ တန်းမထွက်သွားအောင် ဖမ်းထားမည့် Event Listener
 window.addEventListener('popstate', function(event) {
     if (event.state && event.state.viewId) {
-        switchView(event.state.viewId, true); // ရှေ့စာမျက်နှာကို ပြန်ခေါ်သည်
+        switchView(event.state.viewId, true);
     } else {
-        switchView('viewHome', true); // ဘာမှမရှိတော့ရင် Home ကိုပြန်သွားသည်
+        switchView('viewHome', true);
     }
 });
-
 
 function selectPageCountAndBuild(num) {
     totalPages = num;
@@ -650,6 +658,7 @@ function toggleRejectUI() {
 
 function saveGlobalSettings() {
     localStorage.setItem('hwm_bgColor', document.getElementById('bgColor').value);
+    localStorage.setItem('hwm_bgImg', document.getElementById('bgImgInput').value);
     localStorage.setItem('hwm_bgEmoji', document.getElementById('bgEmoji').value);
     localStorage.setItem('hwm_projectName', document.getElementById('projectNameInput').value);
 }
@@ -678,7 +687,7 @@ function loadPageDataIntoEditor() {
 function resetAllData() {
     if(confirm("အကုန်ဖျက်ပြီး အစကပြန်စမှာ သေချာပါသလား?")) {
         localStorage.clear();
-        window.location.reload(); // အသစ်ပြန်စရန် ပြောင်းပေးလိုက်သည်
+        window.location.reload();
     }
 }
 
@@ -686,8 +695,14 @@ function generateHTMLString() {
     saveCurrentPageData(); 
     saveGlobalSettings();
     const bgColor = document.getElementById('bgColor').value;
+    const bgImg = document.getElementById('bgImgInput').value.trim();
     const bgEmoji = document.getElementById('bgEmoji').value || "✨";
     let pagesHTMLContent = "";
+
+    let bgStyle = `background-color: ${bgColor};`;
+    if(bgImg !== "") {
+        bgStyle += ` background-image: url('${bgImg}'); background-size: cover; background-position: center; background-repeat: no-repeat;`;
+    }
 
     for (let i = 0; i < totalPages; i++) {
         const pageNum = i + 1;
@@ -710,19 +725,15 @@ function generateHTMLString() {
         }
 
         let navigationButtons = `<div class="nav-box">`;
-        
         if (i > 0 && pData.showBack !== false) {
             navigationButtons += `<button class="nav-btn back" onclick="goToPage(${pageNum - 1})">${pData.backText || '⬅️ နောက်သို့'}</button>`;
         }
-        
         if (pData.showReject) {
             navigationButtons += `<button id="rej_btn_${pageNum}" class="nav-btn reject" onclick="clickRejectBtn(${pageNum})">${pData.rejText || 'ငြင်းမည် ❌'}</button>`;
         }
-        
         if (pData.showNext !== false && pageNum < totalPages) {
             navigationButtons += `<button id="next_btn_${pageNum}" class="nav-btn next" onclick="goToPage(${pageNum + 1})">${pData.nextText || 'ရှေ့သို့ ➡️'}</button>`;
         }
-        
         navigationButtons += `</div>`;
 
         pagesHTMLContent += `
@@ -745,7 +756,7 @@ function generateHTMLString() {
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Myanmar:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { margin: 0; padding: 0; background-color: ${bgColor}; height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Pyidaungsu', 'Noto Sans Myanmar', sans-serif; overflow: hidden; position: relative; }
+        body { margin: 0; padding: 0; ${bgStyle} height: 100vh; display: flex; justify-content: center; align-items: center; font-family: 'Pyidaungsu', 'Noto Sans Myanmar', sans-serif; overflow: hidden; position: relative; }
         .web-page-card { background: rgba(18, 26, 41, 0.92); color: #f1f5f9; border: 1px solid rgba(255,255,255,0.1); padding: 32px 24px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center; backdrop-filter: blur(10px); max-width: 90%; width: 380px; z-index: 10; display: none; box-sizing: border-box; animation: fadeIn 0.4s ease-in-out; }
         .web-page-card.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -852,53 +863,75 @@ function escapeHtml(text) {
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 }
 
+/* Back Button ရအောင် App ထဲမှာပဲ In-App Preview ကြည့်နိုင်အောင် ပြင်ပေးထားပါသည် */
 function previewProject(id) {
     let projects = JSON.parse(localStorage.getItem('hwm_saved_projects') || '[]');
     let proj = projects.find(p => p.id === id);
     if(proj) {
-        const win = window.open();
-        win.document.write(proj.html);
-        win.document.close();
+        const frame = document.getElementById('previewFrame');
+        frame.srcdoc = proj.html;
+        switchView('viewPreview');
     }
 }
 
+/* နာမည် auto ပါပြီးသား Download ပြုလုပ်နိုင်ရန် */
 function downloadProject(id) {
     let projects = JSON.parse(localStorage.getItem('hwm_saved_projects') || '[]');
     let proj = projects.find(p => p.id === id);
     if(proj) {
-        const blob = new Blob([proj.html], { type: "text/html" });
+        let fileName = (proj.name ? proj.name.trim() : "my_project");
+        if (!fileName.toLowerCase().endsWith('.html')) {
+            fileName += '.html';
+        }
+        const blob = new Blob([proj.html], { type: "text/html;charset=utf-8" });
         const link = document.createElement("a");
         link.href = URL.createObjectURL(blob);
-        link.download = (proj.name.replace(/[^a-zA-Z0-9]/g, '_')) + ".html";
+        link.download = fileName;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     }
 }
 
-function shareProject(id) {
+/* Telegram, Messenger စသည့် ဖုန်း App များဆီ တိုက်ရိုက် Share နိုင်ရန် */
+async function shareProject(id) {
     let projects = JSON.parse(localStorage.getItem('hwm_saved_projects') || '[]');
     let proj = projects.find(p => p.id === id);
-    if(proj) {
-        if(navigator.share) {
-            const file = new File([proj.html], (proj.name + ".html"), { type: "text/html" });
-            navigator.share({
+    if(!proj) return;
+
+    let fileName = (proj.name ? proj.name.trim() : "my_project");
+    if (!fileName.toLowerCase().endsWith('.html')) fileName += '.html';
+
+    const file = new File([proj.html], fileName, { type: "text/html" });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+            await navigator.share({
+                files: [file],
                 title: proj.name,
-                text: 'ကျွန်ုပ်ဖန်တီးထားသော ဝက်ဘ်ဆိုက်ဖိုင်ကို ကြည့်ရှုပါ!',
-                files: [file]
-            }).catch(err => {
-                copyTextToClipboard(proj.html);
+                text: 'HTML Web Page Project'
             });
-        } else {
-            copyTextToClipboard(proj.html);
+            return;
+        } catch (err) {
+            if (err.name !== 'AbortError') console.error(err);
         }
     }
-}
 
-function copyTextToClipboard(text) {
-    const blob = new Blob([text], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    prompt("ဖိုင်လင့်ခ် သို့မဟုတ် HTML ကုဒ်ကို ကူးယူပါ -", url);
+    if (navigator.share) {
+        try {
+            await navigator.share({
+                title: proj.name,
+                text: proj.html
+            });
+            return;
+        } catch (err) {}
+    }
+
+    navigator.clipboard.writeText(proj.html).then(() => {
+        alert("📋 HTML Code ကို Clipboard သို့ Copy ကူးပြီးပါပြီ!");
+    }).catch(() => {
+        alert("Share ပြုလုပ်၍ မရပါ။");
+    });
 }
 
 function deleteProject(id) {
