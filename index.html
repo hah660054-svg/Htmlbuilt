@@ -183,7 +183,7 @@
         }
         .btn-projects:hover { background: rgba(255, 255, 255, 0.08); }
 
-        /* PAGE SELECTION VIEW (Matching exact user screenshot request) */
+        /* PAGE SELECTION VIEW */
         .page-select-title {
             text-align: center;
             font-size: 20px;
@@ -404,10 +404,10 @@
         </div>
     </div>
 
-    <!-- 2. PAGE SELECTION VIEW (Matches User Screenshot) -->
+    <!-- 2. PAGE SELECTION VIEW -->
     <div id="viewPageSelect" class="view-section">
         <div class="nav-header">
-            <button class="nav-back-icon" onclick="switchView('viewHome')">⬅️ မီနူး</button>
+            <button class="nav-back-icon" onclick="goBackUI()">⬅️ မီနူးသို့</button>
             <h3 style="margin: 0; font-size: 16px; color: var(--text-main);">Page အရေအတွက် ရွေးပါ</h3>
             <div style="width: 60px;"></div>
         </div>
@@ -426,7 +426,7 @@
     <!-- 3. BUILDER VIEW -->
     <div id="viewBuilder" class="view-section">
         <div class="nav-header">
-            <button class="nav-back-icon" onclick="switchView('viewPageSelect')">⬅️ စာမျက်နှာပြင်မည်</button>
+            <button class="nav-back-icon" onclick="goBackUI()">⬅️ နောက်သို့</button>
             <h2 style="margin:0; font-size: 18px;">Html Editor ⚙️</h2>
             <div style="width: 70px;"></div>
         </div>
@@ -495,7 +495,7 @@
     <!-- 4. PROJECTS VIEW -->
     <div id="viewProjects" class="view-section">
         <div class="nav-header">
-            <button class="nav-back-icon" onclick="switchView('viewHome')">⬅️ မီနူး</button>
+            <button class="nav-back-icon" onclick="goBackUI()">⬅️ မီနူးသို့</button>
             <h2 style="margin:0; font-size: 18px;">Saved Projects 📂</h2>
             <div style="width: 60px;"></div>
         </div>
@@ -552,6 +552,9 @@ function initApp() {
     document.getElementById('bgEmoji').value = localStorage.getItem('hwm_bgEmoji') || "✨";
     document.getElementById('projectNameInput').value = localStorage.getItem('hwm_projectName') || "My Web Project";
 
+    // ဖုန်းကနေ Back ပြန်ထွက်တာကို Control လုပ်ရန် (အစမှတ် နေရာသတ်မှတ်ခြင်း)
+    history.replaceState({ viewId: 'viewHome' }, "", "#viewHome");
+
     updateTabs();
     loadPageDataIntoEditor();
     loadProjectsList();
@@ -562,15 +565,35 @@ function unlockApp() {
     setTimeout(() => { document.getElementById('tgOverlay').style.display = 'none'; }, 1000);
 }
 
-function switchView(viewId) {
+// History အဝင်/အထွက်ကို ထိန်းချုပ်မည့် Function အသစ်
+function switchView(viewId, isBackEvent = false) {
     document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
     document.getElementById(viewId).classList.add('active');
     if(viewId === 'viewProjects') {
         loadProjectsList();
     }
+    
+    // ဖုန်း Back လိုမျိုး ခလုပ်ကနေ လာတာမဟုတ်ရင် History အသစ်ကို သိမ်းမယ်
+    if (!isBackEvent) {
+        history.pushState({ viewId: viewId }, "", "#" + viewId);
+    }
 }
 
-/* User selects 1 Page to 7 Page from vertical list (User Screenshot) */
+// အက်ပ်ထဲက "⬅️" ခလုပ်ကို နှိပ်တဲ့အခါ အလုပ်လုပ်မည့် Function
+function goBackUI() {
+    history.back(); // ဖုန်း Back ကို နှိပ်သလိုပဲ အလုပ်လုပ်စေသည်
+}
+
+// ဖုန်းရဲ့ Back ခလုပ်ကို နှိပ်လိုက်တဲ့အခါ တန်းမထွက်သွားအောင် ဖမ်းထားမည့် Event Listener
+window.addEventListener('popstate', function(event) {
+    if (event.state && event.state.viewId) {
+        switchView(event.state.viewId, true); // ရှေ့စာမျက်နှာကို ပြန်ခေါ်သည်
+    } else {
+        switchView('viewHome', true); // ဘာမှမရှိတော့ရင် Home ကိုပြန်သွားသည်
+    }
+});
+
+
 function selectPageCountAndBuild(num) {
     totalPages = num;
     localStorage.setItem('hwm_totalPages', num);
@@ -655,7 +678,7 @@ function loadPageDataIntoEditor() {
 function resetAllData() {
     if(confirm("အကုန်ဖျက်ပြီး အစကပြန်စမှာ သေချာပါသလား?")) {
         localStorage.clear();
-        initApp();
+        window.location.reload(); // အသစ်ပြန်စရန် ပြောင်းပေးလိုက်သည်
     }
 }
 
