@@ -27,7 +27,9 @@
     body.dark-theme .btn.secondary { background: linear-gradient(145deg, #1c1d20, #17181b); color: #E4E6EB; box-shadow: 4px 4px 8px #121315, -4px -4px 8px #222327; }
     body.dark-theme .btn.secondary:active { box-shadow: inset 4px 4px 8px #121315, inset -4px -4px 8px #222327; }
     body.dark-theme .chat-item:active { background-color: #222327; box-shadow: inset 3px 3px 6px #121315, inset -3px -3px 6px #222327; }
-    body.dark-theme .reaction-picker { background: #222327; box-shadow: 3px 3px 10px #121315, -3px -3px 10px #2a2b2f; }
+    body.dark-theme .style-sheet-content { background: #1a1b1e; color: #E4E6EB; }
+    body.dark-theme .msg-action-menu { background: #222327; box-shadow: 5px 5px 15px #121315, -5px -5px 15px #2a2b2f; }
+    body.dark-theme .menu-item { color: #E4E6EB; }
 
     /* Utility Classes */
     .hidden { display: none !important; }
@@ -41,6 +43,12 @@
     .modal-content { background: #e0e5ec; width: 90%; max-width: 400px; border-radius: 25px; padding: 25px; box-shadow: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5); max-height: 90vh; overflow-y: auto; transform: translateY(20px); transition: transform 0.3s, background 0.3s; }
     .modal-overlay.active .modal-content { transform: translateY(0); }
     
+    /* Bottom Sheet Modal for Bubble Styles */
+    .style-sheet-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 150; display: flex; justify-content: center; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .style-sheet-overlay.active { opacity: 1; pointer-events: auto; }
+    .style-sheet-content { background: #e0e5ec; width: 100%; max-width: 500px; border-radius: 25px 25px 0 0; padding: 25px; box-shadow: 0 -10px 25px rgba(0,0,0,0.2); max-height: 55vh; overflow-y: auto; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1); }
+    .style-sheet-overlay.active .style-sheet-content { transform: translateY(0); }
+
     /* 3D Elevated Buttons */
     .btn { background: #0078FF; color: white; border: none; padding: 14px; border-radius: 20px; font-weight: 600; font-size: 16px; cursor: pointer; width: 100%; margin-top: 15px; box-shadow: 4px 4px 10px rgba(0, 120, 255, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.8); transition: all 0.2s ease; }
     .btn:active { box-shadow: inset 4px 4px 10px rgba(0, 91, 181, 0.5), inset -4px -4px 10px rgba(50, 150, 255, 0.5); transform: scale(0.98); }
@@ -66,7 +74,6 @@
     .my-name .edit-icon { font-size: 12px; color: #0078FF; }
     .header-actions { display: flex; gap: 15px; }
     
-    /* 3D Circular Buttons */
     .icon-btn { width: 45px; height: 45px; border-radius: 50%; background: #e0e5ec; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 20px; border: none; box-shadow: 5px 5px 10px rgb(163,177,198,0.6), -5px -5px 10px rgba(255,255,255, 0.6); transition: all 0.2s; }
     .icon-btn:active { box-shadow: inset 4px 4px 8px rgb(163,177,198,0.6), inset -4px -4px 8px rgba(255,255,255, 0.6); transform: scale(0.95); }
     
@@ -78,6 +85,13 @@
     .chat-item-name { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
     .chat-item-lastmsg { font-size: 14px; color: #65676B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
+    /* Unread Status Styles (Messenger / TT style) */
+    .chat-item.unread .chat-item-name { font-weight: 900; color: #000; }
+    body.dark-theme .chat-item.unread .chat-item-name { color: #FFFFFF; }
+    .chat-item.unread .chat-item-lastmsg { font-weight: 800; color: #111; }
+    body.dark-theme .chat-item.unread .chat-item-lastmsg { color: #FFFFFF; }
+    .unread-badge { background: #FF3B30; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; margin-left: auto; box-shadow: 0 2px 5px rgba(255,59,48,0.4); }
+
     /* Screen 3: Chat Room */
     #chatRoomScreen { z-index: 20; }
     .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #e0e5ec; box-shadow: 0 4px 10px rgba(0,0,0,0.05); z-index: 5; }
@@ -86,38 +100,48 @@
     .chat-ai-pic { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; cursor: pointer; box-shadow: 2px 2px 5px rgb(163,177,198,0.6), -2px -2px 5px rgba(255,255,255, 0.6); }
     .chat-ai-name { font-size: 18px; font-weight: 700; }
     .api-settings-btn { font-size: 14px; font-weight: 600; color: #0078FF; cursor: pointer; background: #e0e5ec; padding: 8px 15px; border-radius: 20px; border: none; box-shadow: 4px 4px 8px rgb(163,177,198,0.6), -4px -4px 8px rgba(255,255,255, 0.6); }
-    .api-settings-btn:active { box-shadow: inset 3px 3px 6px rgb(163,177,198,0.6), inset -3px -3px 6px rgba(255,255,255, 0.6); }
     
     .chat-history { flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; background-size: cover; background-position: center; position: relative; scroll-behavior: smooth; }
     .msg-row { display: flex; flex-direction: column; position: relative; animation: fadeIn 0.3s ease-out; }
     
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* 3D Chat Bubbles */
-    .msg-bubble { max-width: 80%; padding: 12px 16px; font-size: 15px; line-height: 1.5; word-break: break-word; position: relative; user-select: none; }
+    /* 3D Chat Bubbles & Custom Styles */
+    .msg-bubble { max-width: 80%; padding: 12px 16px; font-size: 15px; line-height: 1.5; word-break: break-word; position: relative; user-select: none; cursor: pointer; }
     .msg-user { background: linear-gradient(145deg, #0078FF, #006ce6); color: white; align-self: flex-end; border-radius: 20px 20px 4px 20px; box-shadow: 4px 4px 10px rgba(0, 120, 255, 0.3); }
     .msg-bot { background: #e0e5ec; color: #333; align-self: flex-start; border-radius: 20px 20px 20px 4px; box-shadow: 5px 5px 10px rgb(163,177,198,0.5), -5px -5px 10px rgba(255,255,255, 0.7); }
+    
+    /* 5 Custom Bubble Styles */
+    .bubble-style-1 { background: linear-gradient(135deg, #E6D5FA, #C493FF) !important; color: #2B0054 !important; border: 2px solid #9D4EDD; box-shadow: 0 5px 15px rgba(157, 78, 221, 0.4); }
+    .bubble-style-2 { background: linear-gradient(135deg, #FFD1DC, #FF97B7) !important; color: #59001D !important; border: 2px solid #FF6594; box-shadow: 0 5px 15px rgba(255, 101, 148, 0.4); }
+    .bubble-style-3 { background: linear-gradient(135deg, #D5F3FA, #90E0EF) !important; color: #003B46 !important; border: 2px solid #00B4D8; box-shadow: 0 5px 15px rgba(0, 180, 216, 0.4); }
+    .bubble-style-4 { background: linear-gradient(135deg, #EED5FA, #D8A8FF) !important; color: #3A0054 !important; border: 2px solid #C77DFF; box-shadow: 0 5px 15px rgba(199, 125, 255, 0.4); }
+    .bubble-style-5 { background: linear-gradient(135deg, #FFF0F5, #FFB6C1) !important; color: #660022 !important; border: 2px solid #FF69B4; box-shadow: 0 5px 15px rgba(255, 105, 180, 0.4); }
+
     .msg-img { max-width: 100%; border-radius: 12px; margin-top: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
     
-    /* Reaction & Pickers */
     .reaction-badge { position: absolute; bottom: -10px; background: #e0e5ec; border-radius: 12px; padding: 3px 8px; font-size: 12px; box-shadow: 2px 2px 5px rgb(163,177,198,0.6), -2px -2px 5px rgba(255,255,255, 0.6); z-index: 5; color: #000; }
     .user-row .reaction-badge { right: 10px; }
     .bot-row .reaction-badge { left: 10px; }
     
-    .reaction-picker { position: absolute; top: -50px; background: #e0e5ec; border-radius: 25px; padding: 8px 12px; display: flex; gap: 10px; box-shadow: 5px 5px 15px rgb(163,177,198,0.7), -5px -5px 15px rgba(255,255,255, 0.8); z-index: 50; animation: popUp 0.2s ease-out; }
-    .reaction-picker span { font-size: 24px; cursor: pointer; transition: transform 0.1s; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2)); }
-    .reaction-picker span:active { transform: scale(1.3); }
-    .user-row .reaction-picker { right: 0; }
-    .bot-row .reaction-picker { left: 0; }
+    /* Sequential Action Menu Popup when message is clicked */
+    .msg-action-menu { position: absolute; top: -130px; background: #e0e5ec; border-radius: 18px; padding: 10px; display: flex; flex-direction: column; gap: 6px; box-shadow: 5px 5px 15px rgb(163,177,198,0.7), -5px -5px 15px rgba(255,255,255, 0.8); z-index: 60; min-width: 170px; animation: popUp 0.2s ease-out; }
+    .user-row .msg-action-menu { right: 0; }
+    .bot-row .msg-action-menu { left: 0; }
+
+    .menu-reactions { display: flex; gap: 8px; justify-content: center; font-size: 22px; padding-bottom: 6px; border-bottom: 1px solid rgba(0,0,0,0.1); }
+    .menu-reactions span { cursor: pointer; transition: transform 0.1s; }
+    .menu-reactions span:active { transform: scale(1.3); }
+
+    .menu-item { font-size: 14px; font-weight: 600; padding: 8px 10px; border-radius: 10px; cursor: pointer; text-align: left; color: #333; display: flex; align-items: center; gap: 8px; }
+    .menu-item:hover { background: rgba(0,120,255,0.1); color: #0078FF; }
+    .menu-item.delete { color: #E41E3F; }
+    .menu-item.delete:hover { background: rgba(228,30,63,0.1); }
 
     .floating-heart { position: absolute; font-size: 50px; pointer-events: none; animation: floatUp 0.8s ease-out forwards; z-index: 100; filter: drop-shadow(0 5px 10px rgba(0,0,0,0.2)); }
     @keyframes floatUp { 0% { opacity: 1; transform: scale(0.5) translateY(0); } 50% { transform: scale(1.2) translateY(-20px); } 100% { opacity: 0; transform: scale(1) translateY(-60px); } }
     @keyframes popUp { from { opacity: 0; transform: scale(0.8) translateY(10px); } to { opacity: 1; transform: scale(1) translateY(0); } }
 
-    .msg-actions { display: flex; font-size: 12px; margin-top: 6px; cursor: pointer; color: #888; font-weight: 600; }
-    .msg-row.user-row .msg-actions { justify-content: flex-end; padding-right: 5px; }
-    .msg-row.bot-row .msg-actions { justify-content: flex-start; padding-left: 5px; }
-    
     /* 3D Input Area */
     .chat-input-area { padding: 15px; background: #e0e5ec; display: flex; gap: 12px; align-items: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.03); z-index: 5; }
     .chat-input { flex: 1; background: #e0e5ec; border: none; padding: 14px 20px; border-radius: 25px; font-size: 15px; outline: none; box-shadow: inset 4px 4px 8px rgb(163,177,198,0.6), inset -4px -4px 8px rgba(255,255,255, 0.6); }
@@ -128,13 +152,15 @@
     .img-upload-box img { width: 100%; height: 100%; object-fit: cover; }
     
     .api-keys-grid { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px; }
-    
-    /* Theme Toggle Switch */
     .theme-switch-box { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #e0e5ec; border-radius: 15px; margin-bottom: 15px; box-shadow: 5px 5px 10px rgb(163,177,198,0.5), -5px -5px 10px rgba(255,255,255, 0.6); }
     
-    /* Typing Indicator */
     .typing-indicator { align-self: flex-start; padding: 10px 15px; background: #e0e5ec; border-radius: 20px; box-shadow: 3px 3px 8px rgb(163,177,198,0.5), -3px -3px 8px rgba(255,255,255, 0.7); font-size: 14px; font-weight: bold; color: #888; animation: pulse 1s infinite alternate; }
     @keyframes pulse { from { opacity: 0.6; } to { opacity: 1; } }
+
+    /* Bubble Preview Grid in Bottom Sheet */
+    .style-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px; }
+    .style-card { padding: 15px; border-radius: 15px; text-align: center; cursor: pointer; font-weight: bold; border: 2px solid transparent; box-shadow: 4px 4px 10px rgb(163,177,198,0.6); }
+    .style-card:active { transform: scale(0.97); }
   </style>
 </head>
 <body>
@@ -195,6 +221,22 @@
     <div class="chat-input-area">
       <input type="text" id="msgInput" class="chat-input" placeholder="စာရိုက်ပါ..." onkeypress="if(event.key==='Enter') sendMessage()">
       <button class="send-btn" onclick="sendMessage()">➤</button>
+    </div>
+  </div>
+
+  <!-- BOTTOM SHEET MODAL: Bubble Styles (5 Designs + Normal) -->
+  <div id="bubbleStyleSheet" class="style-sheet-overlay" onclick="closeBubbleStyleSheet(event)">
+    <div class="style-sheet-content">
+      <h3 style="margin-top:0; text-align:center;">🎨 Bubble Style ရွေးရန်</h3>
+      <div class="style-grid">
+        <div class="style-card" style="background:#e0e5ec; color:#333;" onclick="selectBubbleStyle('normal')">⬜ Normal (မူလ)</div>
+        <div class="style-card bubble-style-1" onclick="selectBubbleStyle('bubble-style-1')">🌙 Purple Moon</div>
+        <div class="style-card bubble-style-2" onclick="selectBubbleStyle('bubble-style-2')">📚 Pink Library</div>
+        <div class="style-card bubble-style-3" onclick="selectBubbleStyle('bubble-style-3')">🌊 Ocean Shells</div>
+        <div class="style-card bubble-style-4" onclick="selectBubbleStyle('bubble-style-4')">🎀 Cute Bows</div>
+        <div class="style-card bubble-style-5" onclick="selectBubbleStyle('bubble-style-5')">💖 Glossy Pink</div>
+      </div>
+      <button class="btn secondary" style="margin-top:20px;" onclick="closeBubbleStyleSheet()">ပိတ်မည်</button>
     </div>
   </div>
 
@@ -285,7 +327,7 @@
 
     let tempAiPicBase64 = null;
     let activeModal = null;
-    let activeReactionMenuIndex = null;
+    let activeActionMenuIndex = null; // Index of message showing the sequential popup menu
     const defaultAiPic = "https://ui-avatars.com/api/?name=AI&background=0078FF&color=fff";
 
     // --- Web Audio Notification (Pop Sound) ---
@@ -341,7 +383,9 @@
           messages: [
             { role: 'model', content: "ဟယ်လို! သင့်ကိုယ်ပိုင် API Key အခမဲ့ ယူနည်းကို ရှင်းပြပေးပါမယ်။\n\n၁။ အောက်ပါလင့်ကို နှိပ်ပြီး Google AI Studio သို့ သွားပါ။\n👉 https://aistudio.google.com/app/apikey \n\n၂။ 'Create API Key' ခလုတ်ကို နှိပ်ပါ။\n၃။ ရလာတဲ့ 'AIza...' နဲ့စတဲ့ Key ကို Copy ကူးပါ။\n၄။ ညာဘက်အပေါ်ထောင့်က '🔑 API' ခလုတ်ကို နှိပ်ပြီး ထည့်သွင်းပါ။" }
           ],
-          lastUpdated: Date.now()
+          lastUpdated: Date.now(),
+          unreadCount: 0,
+          bubbleStyle: null
         });
         saveChats();
       }
@@ -431,25 +475,45 @@
       const newChat = {
         id: Date.now().toString(), name: name, age: document.getElementById('newAiAge').value || '18',
         gender: document.getElementById('newAiGender').value, relation: document.getElementById('newAiRelation').value,
-        pic: tempAiPicBase64, bg: null, messages: [{ role: 'model', content: `ဟိုင်း 👋 ${appState.myUserName}၊ အခုကစပြီး စကားပြောလို့ရပါပြီနော်။` }], lastUpdated: Date.now()
+        pic: tempAiPicBase64, bg: null, messages: [{ role: 'model', content: `ဟိုင်း 👋 ${appState.myUserName}၊ အခုကစပြီး စကားပြောလို့ရပါပြီနော်။` }], lastUpdated: Date.now(),
+        unreadCount: 1, bubbleStyle: null
       };
       appState.chats.unshift(newChat); saveChats(); closeModal('newChatModal'); renderChatList(); openChatRoom(newChat.id);
     }
 
+    // --- RENDER CHAT LIST WITH UNREAD BADGES & BOLD DARK STYLES ---
     function renderChatList() {
       const container = document.getElementById('chatList'); container.innerHTML = '';
       appState.chats.sort((a,b) => b.lastUpdated - a.lastUpdated);
+      
       appState.chats.forEach(chat => {
         const lastMsg = chat.messages.length > 0 ? chat.messages[chat.messages.length-1].content.substring(0, 30) : '';
-        const div = document.createElement('div'); div.className = `chat-item`; div.onclick = () => openChatRoom(chat.id);
-        div.innerHTML = `<img src="${chat.pic || defaultAiPic}" class="chat-item-pic">
-          <div class="chat-item-info"><div class="chat-item-name">${chat.name}</div><div class="chat-item-lastmsg">${lastMsg}</div></div>`;
+        const unread = chat.unreadCount && chat.unreadCount > 0;
+        
+        const div = document.createElement('div'); 
+        div.className = `chat-item ${unread ? 'unread' : ''}`; 
+        div.onclick = () => {
+          chat.unreadCount = 0; 
+          saveChats();
+          openChatRoom(chat.id);
+        };
+        
+        div.innerHTML = `
+          <img src="${chat.pic || defaultAiPic}" class="chat-item-pic">
+          <div class="chat-item-info">
+            <div class="chat-item-name">${chat.name}</div>
+            <div class="chat-item-lastmsg">${lastMsg}</div>
+          </div>
+          ${unread ? `<div class="unread-badge">${chat.unreadCount}</div>` : ''}
+        `;
         container.appendChild(div);
       });
     }
 
     function openChatRoom(chatId) {
       appState.currentChatId = chatId; const chat = appState.chats.find(c => c.id === chatId);
+      chat.unreadCount = 0; saveChats(); 
+      
       document.getElementById('chatHeaderName').innerText = chat.name; document.getElementById('chatHeaderPic').src = chat.pic || defaultAiPic;
       const historyBox = document.getElementById('chatHistoryBox');
       historyBox.style.backgroundImage = chat.bg ? `url(${chat.bg})` : 'none';
@@ -462,93 +526,124 @@
     }
     function goBack() { closeChatRoom(); }
 
-    /* =======================================
-       🔥 CHAT RENDER & APPEND OPTIMIZATION 🔥
-       (Fixes the scroll jump issue entirely)
-       ======================================= */
-    
-    // Renders the entire history once when opening a chat
     function renderChatHistory(chat, preserveScroll = false) {
       const box = document.getElementById('chatHistoryBox'); 
-      const currentScroll = box.scrollTop; // Save current scroll position
-      box.innerHTML = ''; // Clear box
+      const currentScroll = box.scrollTop; 
+      box.innerHTML = ''; 
       
       chat.messages.forEach((m, index) => {
-        appendMsgUI(m, index, false); // false = do not auto-scroll on every individual old message
+        appendMsgUI(m, index, false); 
       });
       
       if (preserveScroll) {
-        box.scrollTop = currentScroll; // Keep scroll position for reactions/deletions
+        box.scrollTop = currentScroll; 
       } else {
-        box.scrollTop = box.scrollHeight; // Scroll to bottom naturally on open
+        box.scrollTop = box.scrollHeight; 
       }
     }
 
-    let lastTapTime = 0; let tapTimeout = null;
-    function handleBubbleTap(e, msgIndex) {
-      e.stopPropagation(); const now = Date.now(); const timeDiff = now - lastTapTime;
-      if (timeDiff < 300 && timeDiff > 0) {
-        clearTimeout(tapTimeout); addReaction(msgIndex, '❤️'); showFloatingHeart(e.clientX, e.clientY); lastTapTime = 0;
-      } else {
-        lastTapTime = now; tapTimeout = setTimeout(() => { toggleReactionMenu(msgIndex); lastTapTime = 0; }, 300);
-      }
-    }
-
-    function toggleReactionMenu(msgIndex) {
-      activeReactionMenuIndex = (activeReactionMenuIndex === msgIndex) ? null : msgIndex;
+    // --- POPUP ACTION MENU UPON MESSAGE CLICK/TAP ---
+    function handleBubbleClick(e, msgIndex) {
+      e.stopPropagation();
+      activeActionMenuIndex = (activeActionMenuIndex === msgIndex) ? null : msgIndex;
       renderChatHistory(appState.chats.find(c => c.id === appState.currentChatId), true);
     }
 
-    function addReaction(msgIndex, emoji) {
-      const chat = appState.chats.find(c => c.id === appState.currentChatId); const msg = chat.messages[msgIndex];
-      msg.reaction = (msg.reaction === emoji) ? null : emoji; saveChats(); activeReactionMenuIndex = null; 
-      renderChatHistory(chat, true); // Re-render but keep scroll position
+    function addReactionFromMenu(msgIndex, emoji, event) {
+      event.stopPropagation();
+      const chat = appState.chats.find(c => c.id === appState.currentChatId); 
+      const msg = chat.messages[msgIndex];
+      msg.reaction = (msg.reaction === emoji) ? null : emoji; 
+      saveChats(); 
+      activeActionMenuIndex = null; 
+      renderChatHistory(chat, true);
     }
 
-    function showFloatingHeart(x, y) {
-      const heart = document.createElement('div'); heart.className = 'floating-heart'; heart.innerText = '❤️';
-      heart.style.left = (x - 25) + 'px'; heart.style.top = (y - 50) + 'px';
-      document.body.appendChild(heart); setTimeout(() => heart.remove(), 800);
+    // --- BUBBLE STYLE SHEET FUNCTIONS ---
+    function openBubbleStyleSheet() {
+      activeActionMenuIndex = null;
+      document.getElementById('bubbleStyleSheet').classList.add('active');
+    }
+    function closeBubbleStyleSheet(e) {
+      if (!e || e.target.id === 'bubbleStyleSheet' || e.target.classList.contains('secondary')) {
+        document.getElementById('bubbleStyleSheet').classList.remove('active');
+      }
+    }
+    function selectBubbleStyle(styleClass) {
+      const chat = appState.chats.find(c => c.id === appState.currentChatId);
+      chat.bubbleStyle = styleClass === 'normal' ? null : styleClass;
+      saveChats();
+      renderChatHistory(chat, true);
+      closeBubbleStyleSheet();
     }
 
-    // Single message appending function (Used for new incoming/outgoing messages)
+    // Single message appending function (Clean UI without clutter under messages)
     function appendMsgUI(m, msgIndex, autoScroll = true) {
       const box = document.getElementById('chatHistoryBox');
       const rowDiv = document.createElement('div'); rowDiv.className = `msg-row ${m.role === 'user' ? 'user-row' : 'bot-row'}`;
       
-      if (activeReactionMenuIndex === msgIndex) {
-        const picker = document.createElement('div'); picker.className = 'reaction-picker';
-        ['❤️', '👍', '😂', '😮', '😭', '😡'].forEach(e => {
-          const span = document.createElement('span'); span.innerText = e;
-          span.onclick = (event) => { event.stopPropagation(); addReaction(msgIndex, e); }; picker.appendChild(span);
-        }); rowDiv.appendChild(picker);
-      }
-
-      const bubbleDiv = document.createElement('div'); bubbleDiv.className = `msg-bubble ${m.role === 'user' ? 'msg-user' : 'msg-bot'}`;
-      bubbleDiv.onclick = (e) => handleBubbleTap(e, msgIndex);
+      const chat = appState.chats.find(c => c.id === appState.currentChatId);
+      const baseBubbleClass = m.role === 'user' ? 'msg-user' : 'msg-bot';
+      const activeStyle = chat.bubbleStyle ? chat.bubbleStyle : '';
+      
+      const bubbleDiv = document.createElement('div'); 
+      bubbleDiv.className = `msg-bubble ${baseBubbleClass} ${activeStyle}`;
+      bubbleDiv.onclick = (e) => handleBubbleClick(e, msgIndex);
       
       let text = m.content;
       if (text.includes('http') && !text.startsWith('img:')) text = text.replace(/(https?:\/\/[^\s]+)/g, "<a href='$1' target='_blank' style='color:inherit; text-decoration:underline;'>$1</a>");
       if (text.startsWith('img:')) bubbleDiv.innerHTML = `<img src="${text.substring(4)}" class="msg-img">`;
       else bubbleDiv.innerHTML = text.replace(/\n/g, '<br>');
 
-      if (m.reaction) { const badge = document.createElement('div'); badge.className = 'reaction-badge'; badge.innerText = m.reaction; bubbleDiv.appendChild(badge); }
-      rowDiv.appendChild(bubbleDiv);
-      
-      const delDiv = document.createElement('div'); delDiv.className = 'msg-actions'; delDiv.innerHTML = '🗑️ ဖျက်မည်';
-      delDiv.onclick = (e) => { e.stopPropagation(); deleteMsg(msgIndex); }; rowDiv.appendChild(delDiv);
-      
-      box.appendChild(rowDiv); 
-      
-      if (autoScroll) {
-        box.scrollTop = box.scrollHeight; // Only scroll to bottom for newly appended messages
+      if (m.reaction) { 
+        const badge = document.createElement('div'); 
+        badge.className = 'reaction-badge'; 
+        badge.innerText = m.reaction; 
+        bubbleDiv.appendChild(badge); 
       }
+
+      // Sequential Popup Action Menu when message is tapped
+      if (activeActionMenuIndex === msgIndex) {
+        const menuDiv = document.createElement('div');
+        menuDiv.className = 'msg-action-menu';
+        
+        const emojiRow = document.createElement('div');
+        emojiRow.className = 'menu-reactions';
+        ['❤️', '👍', '😂', '😮', '😭', '😡'].forEach(em => {
+          const span = document.createElement('span');
+          span.innerText = em;
+          span.onclick = (ev) => addReactionFromMenu(msgIndex, em, ev);
+          emojiRow.appendChild(span);
+        });
+        menuDiv.appendChild(emojiRow);
+
+        const styleOpt = document.createElement('div');
+        styleOpt.className = 'menu-item';
+        styleOpt.innerHTML = '🎨 Bubble Style';
+        styleOpt.onclick = (ev) => { ev.stopPropagation(); openBubbleStyleSheet(); };
+        menuDiv.appendChild(styleOpt);
+
+        const delOpt = document.createElement('div');
+        delOpt.className = 'menu-item delete';
+        delOpt.innerHTML = '🗑️ ဖျက်မည်';
+        delOpt.onclick = (ev) => { ev.stopPropagation(); deleteMsg(msgIndex); };
+        menuDiv.appendChild(delOpt);
+
+        bubbleDiv.appendChild(menuDiv);
+      }
+
+      rowDiv.appendChild(bubbleDiv);
+      box.appendChild(rowDiv); 
+      if (autoScroll) box.scrollTop = box.scrollHeight;
     }
 
     function deleteMsg(index) {
       if(confirm("ဒီစာကို ဖျက်မှာ သေချာလား?")) {
-        const chat = appState.chats.find(c => c.id === appState.currentChatId); chat.messages.splice(index, 1);
-        saveChats(); renderChatHistory(chat, true); // Keep scroll position
+        const chat = appState.chats.find(c => c.id === appState.currentChatId); 
+        chat.messages.splice(index, 1);
+        activeActionMenuIndex = null;
+        saveChats(); 
+        renderChatHistory(chat, true);
       }
     }
 
@@ -595,7 +690,6 @@ Your assigned age is ${chat.age}, Gender is ${chat.gender}. Relation: ${chat.rel
       let chat = appState.chats.find(c => c.id === appState.currentChatId);
       if (chat.id === 'api_guide') return alert("ဒါက Guide Chat သီးသန့်ဖြစ်လို့ စာပို့လို့ မရပါ။ Chat အသစ် ဖန်တီးပါ။");
 
-      // Append User Message to UI directly (NO FULL RENDER)
       chat.messages.push({ role: 'user', content: text }); chat.lastUpdated = Date.now(); saveChats();
       appendMsgUI(chat.messages[chat.messages.length - 1], chat.messages.length - 1, true); 
       input.value = '';
@@ -606,7 +700,6 @@ Your assigned age is ${chat.age}, Gender is ${chat.gender}. Relation: ${chat.rel
         return;
       }
 
-      // Show Typing Indicator
       const box = document.getElementById('chatHistoryBox');
       const typingDiv = document.createElement('div'); typingDiv.id = "typingIndicator"; typingDiv.className = "typing-indicator"; typingDiv.innerText = "Typing...";
       box.appendChild(typingDiv); box.scrollTop = box.scrollHeight;
@@ -625,7 +718,6 @@ Your assigned age is ${chat.age}, Gender is ${chat.gender}. Relation: ${chat.rel
               if (r === lastRole) geminiContents[geminiContents.length - 1].parts[0].text += "\n" + m.content;
               else { geminiContents.push({ role: r, parts: [{ text: m.content }] }); lastRole = r; }
             }
-            // Uses gemini-3.6-flash as requested
             const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${keyObj.key}`, {
               method: 'POST', headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: geminiContents })
@@ -644,11 +736,11 @@ Your assigned age is ${chat.age}, Gender is ${chat.gender}. Relation: ${chat.rel
         } catch (e) { console.error(e); }
       }
 
-      // Remove Typing Indicator
       const tInd = document.getElementById("typingIndicator"); if(tInd) tInd.remove();
 
       if (!success) {
         chat.messages.push({ role: 'model', content: "⚠️ အင်တာနက် သို့မဟုတ် API ချိတ်ဆက်မှု အခက်အခဲဖြစ်နေပါသည်။" });
+        chat.unreadCount = (chat.unreadCount || 0) + 1;
         chat.lastUpdated = Date.now(); saveChats(); 
         appendMsgUI(chat.messages[chat.messages.length - 1], chat.messages.length - 1, true); 
         return;
@@ -657,7 +749,6 @@ Your assigned age is ${chat.age}, Gender is ${chat.gender}. Relation: ${chat.rel
       let hasPic = replyText.includes('[SEND_PIC]');
       let cleanText = replyText.replace(/\[.*?\]/g, '').replace(/\\n/g, '').trim();
 
-      // Split messages logically by "|||"
       let splitMessages = cleanText.split('|||').map(t => t.trim()).filter(t => t.length > 0);
       
       if (hasPic) {
@@ -665,17 +756,17 @@ Your assigned age is ${chat.age}, Gender is ${chat.gender}. Relation: ${chat.rel
         splitMessages.push(`img:https://image.pollinations.ai/prompt/${p}?width=512&height=512&nologo=true`);
       }
 
-      // Push separated messages with delay to simulate real typing (Uses appendMsgUI directly)
       let delay = 0;
       splitMessages.forEach((msgPart) => {
         setTimeout(() => {
           chat.messages.push({ role: 'model', content: msgPart });
+          chat.unreadCount = (chat.unreadCount || 0) + 1; 
           chat.lastUpdated = Date.now();
           saveChats(); 
           appendMsgUI(chat.messages[chat.messages.length - 1], chat.messages.length - 1, true); 
-          playNotifSound(); // Play pop sound
+          playNotifSound(); 
         }, delay);
-        delay += 1200; // 1.2 seconds delay between each message chunk
+        delay += 1200; 
       });
     }
     
