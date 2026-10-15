@@ -23,8 +23,6 @@
     body.dark-theme .icon-btn, body.dark-theme .theme-switch-box { background: linear-gradient(145deg, #1c1d20, #17181b); box-shadow: 3px 3px 6px #121315, -3px -3px 6px #222327; color: #E4E6EB; }
     body.dark-theme .btn.secondary { background: linear-gradient(145deg, #1c1d20, #17181b); color: #E4E6EB; box-shadow: 4px 4px 8px #121315, -4px -4px 8px #222327; }
     body.dark-theme .style-sheet-content { background: #1a1b1e; color: #E4E6EB; }
-    body.dark-theme .msg-action-menu { background: #222327; box-shadow: 5px 5px 15px #121315, -5px -5px 15px #2a2b2f; }
-    body.dark-theme .menu-item { color: #E4E6EB; }
 
     .hidden { display: none !important; }
     .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #e0e5ec; display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 10; }
@@ -37,7 +35,6 @@
     .modal-content { background: #e0e5ec; width: 90%; max-width: 400px; border-radius: 25px; padding: 25px; box-shadow: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5); max-height: 90vh; overflow-y: auto; transform: translateY(20px); transition: transform 0.3s; }
     .modal-overlay.active .modal-content { transform: translateY(0); }
     
-    /* Side Menu Drawer */
     .side-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
     .side-menu-overlay.active { opacity: 1; pointer-events: auto; }
     .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #e0e5ec; z-index: 210; box-shadow: 5px 0 15px rgba(0,0,0,0.2); transition: left 0.3s ease; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
@@ -54,7 +51,6 @@
     .account-avatar.active { border-color: #0078FF; opacity: 1; transform: scale(1.05); }
     .add-account-btn { width: 40px; height: 40px; border-radius: 50%; background: #e0e5ec; border: 2px dashed #0078FF; display: flex; justify-content: center; align-items: center; font-size: 20px; color: #0078FF; cursor: pointer; box-shadow: 3px 3px 6px rgb(163,177,198,0.6); }
 
-    /* Bottom Navigation Bar (2 Tabs) */
     .bottom-nav { display: flex; height: 60px; background: #e0e5ec; border-top: 1px solid rgba(0,0,0,0.08); box-shadow: 0 -4px 10px rgba(0,0,0,0.03); z-index: 5; }
     .nav-tab { flex: 1; border: none; background: none; font-size: 14px; font-weight: 700; color: #65676B; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; transition: 0.2s; }
     .nav-tab.active { color: #0078FF; }
@@ -72,23 +68,19 @@
     .header-actions { display: flex; gap: 10px; align-items: center; }
     
     .icon-btn { width: 45px; height: 45px; border-radius: 50%; background: #e0e5ec; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 20px; border: none; box-shadow: 5px 5px 10px rgb(163,177,198,0.6), -5px -5px 10px rgba(255,255,255, 0.6); transition: all 0.2s; }
-    .icon-btn:active { box-shadow: inset 4px 4px 8px rgb(163,177,198,0.6), inset -4px -4px 8px rgba(255,255,255, 0.6); transform: scale(0.95); }
     
     .chat-list-container { flex: 1; overflow-y: auto; padding: 10px; }
     .chat-item { display: flex; align-items: center; padding: 12px; margin-bottom: 10px; border-radius: 15px; cursor: pointer; transition: all 0.2s; position: relative; }
-    .chat-item:active { background: #d1d9e6; box-shadow: inset 4px 4px 8px rgb(163,177,198,0.5), inset -4px -4px 8px rgba(255,255,255, 0.5); }
     .chat-item-pic { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 15px; box-shadow: 3px 3px 6px rgb(163,177,198,0.6), -3px -3px 6px rgba(255,255,255, 0.6); }
     .chat-item-info { flex: 1; overflow: hidden; }
     .chat-item-name { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
     .chat-item-lastmsg { font-size: 14px; color: #65676B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     
-    .unread-badge { background: #FF3B30; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; margin-left: auto; box-shadow: 0 2px 5px rgba(255,59,48,0.4); }
+    .unread-badge { background: #FF3B30; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; margin-left: auto; }
 
-    /* Search Screen for Users */
     #searchScreen { z-index: 25; }
     .search-box-container { padding: 15px; display: flex; gap: 10px; background: #e0e5ec; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
 
-    /* Chat Room Screen */
     #chatRoomScreen { z-index: 20; }
     .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #e0e5ec; box-shadow: 0 4px 10px rgba(0,0,0,0.05); z-index: 5; }
     .chat-header-left { display: flex; align-items: center; gap: 12px; }
@@ -98,11 +90,8 @@
     .api-settings-btn { font-size: 14px; font-weight: 600; color: #0078FF; cursor: pointer; background: #e0e5ec; padding: 8px 15px; border-radius: 20px; border: none; box-shadow: 4px 4px 8px rgb(163,177,198,0.6), -4px -4px 8px rgba(255,255,255, 0.6); }
     
     .chat-history { flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; background-size: cover; background-position: center; position: relative; scroll-behavior: smooth; }
-    .msg-row { display: flex; flex-direction: column; position: relative; animation: fadeIn 0.3s ease-out; }
-    
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-    .msg-bubble { max-width: 80%; padding: 12px 16px; font-size: 15px; line-height: 1.5; word-break: break-word; position: relative; user-select: none; cursor: pointer; }
+    .msg-row { display: flex; flex-direction: column; position: relative; }
+    .msg-bubble { max-width: 80%; padding: 12px 16px; font-size: 15px; line-height: 1.5; word-break: break-word; position: relative; }
     .msg-user { background: linear-gradient(145deg, #0078FF, #006ce6); color: white; align-self: flex-end; border-radius: 20px 20px 4px 20px; box-shadow: 4px 4px 10px rgba(0, 120, 255, 0.3); }
     .msg-bot { background: #e0e5ec; color: #333; align-self: flex-start; border-radius: 20px 20px 20px 4px; box-shadow: 5px 5px 10px rgb(163,177,198,0.5), -5px -5px 10px rgba(255,255,255, 0.7); }
     
@@ -115,7 +104,6 @@
     
     .api-keys-grid { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px; }
     .theme-switch-box { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #e0e5ec; border-radius: 15px; margin-bottom: 15px; box-shadow: 5px 5px 10px rgb(163,177,198,0.5), -5px -5px 10px rgba(255,255,255, 0.6); }
-    
     .typing-indicator { align-self: flex-start; padding: 10px 15px; background: #e0e5ec; border-radius: 20px; box-shadow: 3px 3px 8px rgb(163,177,198,0.5), -3px -3px 8px rgba(255,255,255, 0.7); font-size: 14px; font-weight: bold; color: #888; }
   </style>
 </head>
@@ -126,7 +114,7 @@
     <div style="font-size: 80px; margin-bottom: 20px;">🌐</div>
     <h2 style="margin-top:0;">AI & P2P Messenger သို့ ကြိုဆိုပါတယ်</h2>
     <p style="color: #65676B; font-size: 15px; margin-bottom: 30px; padding: 0 20px;">
-      ဆက်လက်အသုံးပြုရန် သင့်ရဲ့ Google အကောင့်ဖြင့် အရင်ဆုံး ဝင်ရောက်ပေးပါ။
+      ဆက်လက်အသုံးပြုရန် သင့်ရဲ့ Google အကောင့်ဖြင့် ဝင်ရောက်ပေးပါ။
     </p>
     <button class="btn" onclick="loginWithGoogle()" style="background: #4285F4; color: white; width: 80%; max-width: 320px; margin: 0 auto; display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 16px;">
       🌐 Google အကောင့်ဖြင့် ဝင်မည်
@@ -141,10 +129,8 @@
         <span id="headerTitle" style="font-size: 19px; font-weight: 700;">AI Chats</span>
       </div>
       <div class="header-actions">
-        <!-- Search Button (Visible only on P2P tab) -->
         <button id="searchUsersBtn" class="icon-btn hidden" onclick="openSearchScreen()" title="User ရှာရန်">🔍</button>
         <button class="icon-btn" onclick="openSettingsModal()" title="Settings">⚙️</button>
-        <!-- Action Button depending on Tab -->
         <button id="headerAddBtn" class="icon-btn" onclick="openNewChatModal()" title="AI Chat အသစ်">📝</button>
       </div>
     </div>
@@ -182,7 +168,7 @@
     <div class="chat-list-container" id="searchResultsContainer"></div>
   </div>
 
-  <!-- Telegram Old-Style Side Menu Drawer -->
+  <!-- Side Menu Drawer -->
   <div id="sideMenuOverlay" class="side-menu-overlay" onclick="toggleSideMenu()"></div>
   <div id="sideMenu" class="side-menu">
     <div class="side-menu-header">
@@ -194,12 +180,11 @@
     </div>
     
     <div style="flex: 1;">
-      <div class="menu-item" onclick="openSettingsModal(); toggleSideMenu();">⚙️ App Settings</div>
-      <div class="menu-item" onclick="openApiModal(); toggleSideMenu();">🔑 AI API Keys</div>
-      <div class="menu-item delete" onclick="logoutGoogle()">🚪 Logout အကောင့်ထွက်မည်</div>
+      <div class="menu-item" onclick="openSettingsModal(); toggleSideMenu();" style="padding: 10px 0; cursor:pointer;">⚙️ App Settings</div>
+      <div class="menu-item" onclick="openApiModal(); toggleSideMenu();" style="padding: 10px 0; cursor:pointer;">🔑 AI API Keys</div>
+      <div class="menu-item delete" onclick="logoutGoogle()" style="padding: 10px 0; color:#E41E3F; cursor:pointer;">🚪 Logout အကောင့်ထွက်မည်</div>
     </div>
 
-    <!-- Multi-Account Switcher (Max 3 accounts) -->
     <div class="accounts-list" id="accountsListContainer"></div>
   </div>
 
@@ -225,7 +210,7 @@
   <!-- MODAL: User Profile Preview Modal -->
   <div id="userProfileModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'userProfileModal')">
     <div class="modal-content" style="text-align: center;">
-      <img id="modalProfilePic" src="" style="width:110px; height:110px; border-radius:50%; object-fit:cover; margin-bottom:10px; box-shadow: 5px 5px 15px rgb(163,177,198,0.7);">
+      <img id="modalProfilePic" src="" style="width:110px; height:110px; border-radius:50%; object-fit:cover; margin-bottom:10px;">
       <h2 id="modalProfileName" style="margin:5px 0;">Name</h2>
       <p id="modalProfileUsername" style="color:#0078FF; font-weight:600; margin:0 0 10px 0;">@username</p>
       <p id="modalProfileBio" style="color:#65676B; font-style:italic; margin:0 0 20px 0; word-break: break-word;">Bio...</p>
@@ -244,7 +229,7 @@
     </div>
   </div>
 
-  <!-- MODAL: Edit Name / Username with Cooldown Rules -->
+  <!-- MODAL: Edit Name / Username -->
   <div id="editNameModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'editNameModal')">
     <div class="modal-content">
       <h3 id="editModalTitle" style="margin-top:0; text-align:center;">နာမည် ပြောင်းရန်</h3>
@@ -276,7 +261,7 @@
         <span id="aiPicPlus" style="font-size:30px; color:#888;">+</span>
         <img id="aiPicPreview" src="" class="hidden">
       </div>
-      <input type="text" id="newAiName" class="input-control" placeholder="AI နာမည် (Chou, Nami, စသည်)">
+      <input type="text" id="newAiName" class="input-control" placeholder="AI နာမည်">
       <input type="number" id="newAiAge" class="input-control" placeholder="အသက်" value="18">
       <select id="newAiGender" class="input-control">
         <option value="female">မ 🙋‍♀️</option>
@@ -284,9 +269,7 @@
       </select>
       <select id="newAiRelation" class="input-control">
         <option value="friend">သူငယ်ချင်း</option>
-        <option value="jf">Just Friend</option>
         <option value="romantic">ချစ်သူ</option>
-        <option value="sibling">မောင်နှမ</option>
       </select>
       <button class="btn" onclick="createNewChat()">ဖန်တီးမည်</button>
       <button class="btn secondary" onclick="closeModal('newChatModal')">ပိတ်မည်</button>
@@ -296,7 +279,7 @@
   <!-- MODAL: AI Profile -->
   <div id="aiProfileModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'aiProfileModal')">
     <div class="modal-content" style="text-align: center;">
-      <img id="infoAiPic" src="" style="width:110px; height:110px; border-radius:50%; object-fit:cover; margin-bottom:10px; box-shadow: 5px 5px 15px rgb(163,177,198,0.7);">
+      <img id="infoAiPic" src="" style="width:110px; height:110px; border-radius:50%; object-fit:cover; margin-bottom:10px;">
       <h2 id="infoAiName" style="margin:5px 0;">Name</h2>
       <p id="infoAiDetails" style="color:#65676B; font-weight:600; margin:0 0 20px 0;"></p>
       <input type="file" id="chatBgUpload" accept="image/*" class="hidden" onchange="handleChatBgUpload(event)">
@@ -309,14 +292,13 @@
   <!-- MODAL: API Keys -->
   <div id="apiModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'apiModal')">
     <div class="modal-content">
-      <h3 style="margin-top:0; text-align:center;">🔑 AI API Keys (Max 10)</h3>
+      <h3 style="margin-top:0; text-align:center;">🔑 AI API Keys</h3>
       <div class="api-keys-grid" id="apiKeysContainer"></div>
       <button class="btn" onclick="saveApiKeys()">Save Keys</button>
       <button class="btn secondary" onclick="closeModal('apiModal')">ပိတ်မည်</button>
     </div>
   </div>
 
-  <!-- Firebase SDKs & App Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -356,20 +338,15 @@
       });
     };
 
-    // Register/Update User Profile in Firestore Directory for Searching
     window.syncUserProfileToCloud = async function(uid, name, username, pic, bio) {
       try {
         await setDoc(doc(db, "users", uid), {
-          uid: uid,
-          name: name,
-          username: username,
-          pic: pic || '',
-          bio: bio || ''
+          uid: uid, name: name, username: username,
+          pic: pic || '', bio: bio || ''
         }, { merge: true });
       } catch(e) { console.error("Cloud sync error:", e); }
     };
 
-    // Search Users from Firestore
     window.searchCloudUsers = async function(keyword, callback) {
       try {
         const querySnapshot = await getDocs(collection(db, "users"));
@@ -384,15 +361,10 @@
           }
         });
         callback(results);
-      } catch(e) {
-        console.error("Search error:", e);
-        callback([]);
-      }
+      } catch(e) { callback([]); }
     };
 
-    // --- P2P FIRESTORE REALTIME SYNC ---
     let unsubscribeP2P = null;
-
     window.subP2PMessages = function(roomId, callback) {
       if (unsubscribeP2P) unsubscribeP2P();
       const q = query(collection(db, "p2p_chats", roomId, "messages"), orderBy("timestamp", "asc"));
@@ -410,7 +382,7 @@
           content: text,
           timestamp: serverTimestamp()
         });
-      } catch(e) { console.error("Error sending P2P message: ", e); }
+      } catch(e) { console.error("P2P send error:", e); }
     };
   </script>
 
@@ -419,23 +391,17 @@
     let currentUid = localStorage.getItem('currentAccountUid') || null;
 
     let appState = {
-      myUserName: 'Real human',
-      myUsernameHandle: '@user',
-      myBio: 'Hey there! I am using AI Messenger.',
-      myProfilePic: null,
+      myUserName: 'Real human', myUsernameHandle: '@user',
+      myBio: 'Hey there! I am using AI Messenger.', myProfilePic: null,
       theme: localStorage.getItem('theme') || 'light',
-      apiKeys: [],
-      chats: [],
-      currentChatId: null,
-      lastUsernameChange: 0,
-      lastNameChange: 0
+      apiKeys: [], chats: [], currentChatId: null,
+      lastUsernameChange: 0, lastNameChange: 0
     };
 
-    let currentMainTab = 'ai'; // 'ai' or 'p2p'
+    let currentMainTab = 'ai';
     let selectedSearchedUser = null;
     let tempAiPicBase64 = null;
     let activeModal = null;
-    let activeActionMenuIndex = null;
     let editingFieldType = null;
     const defaultAiPic = "https://ui-avatars.com/api/?name=AI&background=0078FF&color=fff";
 
@@ -448,15 +414,11 @@
           return;
         }
         existingAcc = {
-          uid: user.uid,
-          name: user.displayName || 'User',
+          uid: user.uid, name: user.displayName || 'User',
           username: '@' + user.email.split('@')[0],
           bio: 'Hey there! I am using AI Messenger.',
           pic: user.photoURL || 'https://ui-avatars.com/api/?name=' + user.displayName,
-          chats: [],
-          apiKeys: [],
-          lastUsernameChange: 0,
-          lastNameChange: 0
+          chats: [], apiKeys: [], lastUsernameChange: 0, lastNameChange: 0
         };
         accounts.push(existingAcc);
       }
@@ -464,14 +426,11 @@
       switchAccount(user.uid);
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('mainScreen').classList.remove('hidden');
-      renderChatLists();
-      updateSideMenuUI();
-      renderAccountSwitcher();
+      renderChatLists(); updateSideMenuUI(); renderAccountSwitcher();
     }
 
     function switchAccount(uid) {
-      currentUid = uid;
-      window.firebaseUserUid = uid;
+      currentUid = uid; window.firebaseUserUid = uid;
       localStorage.setItem('currentAccountUid', uid);
       let acc = accounts.find(a => a.uid === uid);
       if(acc) {
@@ -485,20 +444,15 @@
         appState.lastNameChange = acc.lastNameChange || 0;
         window.syncUserProfileToCloud(uid, appState.myUserName, appState.myUsernameHandle, appState.myProfilePic, appState.myBio);
       }
-      renderChatLists();
-      updateSideMenuUI();
-      renderAccountSwitcher();
+      renderChatLists(); updateSideMenuUI(); renderAccountSwitcher();
     }
 
     function saveCurrentAccountData() {
       let acc = accounts.find(a => a.uid === currentUid);
       if(acc) {
-        acc.name = appState.myUserName;
-        acc.username = appState.myUsernameHandle;
-        acc.bio = appState.myBio;
-        acc.pic = appState.myProfilePic;
-        acc.chats = appState.chats;
-        acc.apiKeys = appState.apiKeys;
+        acc.name = appState.myUserName; acc.username = appState.myUsernameHandle;
+        acc.bio = appState.myBio; acc.pic = appState.myProfilePic;
+        acc.chats = appState.chats; acc.apiKeys = appState.apiKeys;
         acc.lastUsernameChange = appState.lastUsernameChange;
         acc.lastNameChange = appState.lastNameChange;
         saveAccounts();
@@ -506,9 +460,7 @@
       }
     }
 
-    function saveAccounts() {
-      localStorage.setItem('ai_messenger_accounts', JSON.stringify(accounts));
-    }
+    function saveAccounts() { localStorage.setItem('ai_messenger_accounts', JSON.stringify(accounts)); }
 
     function renderAccountSwitcher() {
       const container = document.getElementById('accountsListContainer');
@@ -529,26 +481,15 @@
     }
 
     window.onload = () => {
-      checkVPN();
       if(currentUid && accounts.some(a => a.uid === currentUid)) {
         switchAccount(currentUid);
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('mainScreen').classList.remove('hidden');
-        renderChatLists();
-        updateSideMenuUI();
-        renderAccountSwitcher();
+        renderChatLists(); updateSideMenuUI(); renderAccountSwitcher();
       } else {
         document.getElementById('loginScreen').classList.remove('hidden');
       }
     };
-
-    async function checkVPN() {
-      try {
-        let res = await fetch('https://get.geojs.io/v1/ip/country.json');
-        let data = await res.json();
-        if(data.country === 'MM') document.getElementById('loginScreen').style.background = '#1a1b1e';
-      } catch(e) {}
-    }
 
     function toggleSideMenu() {
       document.getElementById('sideMenu').classList.toggle('active');
@@ -562,7 +503,6 @@
       if(appState.myProfilePic) document.getElementById('sideProfilePic').src = appState.myProfilePic;
     }
 
-    // Switch Main Tabs (AI vs P2P)
     function switchMainTab(tab) {
       currentMainTab = tab;
       document.getElementById('tabAiBtn').classList.remove('active');
@@ -576,7 +516,6 @@
         document.getElementById('headerTitle').innerText = 'AI Chats';
         document.getElementById('searchUsersBtn').classList.add('hidden');
         document.getElementById('headerAddBtn').setAttribute('onclick', 'openNewChatModal()');
-        document.getElementById('headerAddBtn').title = 'AI Chat အသစ်';
         document.getElementById('headerAddBtn').innerText = '📝';
       } else {
         document.getElementById('tabP2pBtn').classList.add('active');
@@ -584,21 +523,17 @@
         document.getElementById('headerTitle').innerText = 'လူအချင်းချင်း ချက်တင်';
         document.getElementById('searchUsersBtn').classList.remove('hidden');
         document.getElementById('headerAddBtn').setAttribute('onclick', 'openSearchScreen()');
-        document.getElementById('headerAddBtn').title = 'User ရှာရန်';
         document.getElementById('headerAddBtn').innerText = '🔍';
       }
       renderChatLists();
     }
 
-    // Search Screen Logic
     function openSearchScreen() {
       document.getElementById('searchScreen').classList.add('active');
       document.getElementById('userSearchInput').value = '';
       document.getElementById('searchResultsContainer').innerHTML = '<p style="text-align:center; color:#65676B; margin-top:20px;">ရှာဖွေရန် နာမည် သို့မဟုတ် @username ထည့်ပါ</p>';
     }
-    function closeSearchScreen() {
-      document.getElementById('searchScreen').classList.remove('active');
-    }
+    function closeSearchScreen() { document.getElementById('searchScreen').classList.remove('active'); }
 
     function searchUsers(keyword) {
       keyword = keyword.trim();
@@ -641,88 +576,53 @@
 
     function startChatWithSelectedUser() {
       if (!selectedSearchedUser) return;
-      closeModal('userProfileModal');
-      closeSearchScreen();
-
+      closeModal('userProfileModal'); closeSearchScreen();
       let friendId = selectedSearchedUser.uid;
       let roomId = [currentUid, friendId].sort().join('_');
       let existingChat = appState.chats.find(c => c.id === roomId);
 
       if (!existingChat) {
         let newP2PChat = {
-          id: roomId,
-          type: 'p2p',
-          friendId: friendId,
-          name: selectedSearchedUser.name,
-          username: selectedSearchedUser.username,
+          id: roomId, type: 'p2p', friendId: friendId,
+          name: selectedSearchedUser.name, username: selectedSearchedUser.username,
           pic: selectedSearchedUser.pic || defaultAiPic,
-          messages: [],
-          lastUpdated: Date.now(),
-          unreadCount: 0,
-          bubbleStyle: null
+          messages: [], lastUpdated: Date.now(), unreadCount: 0
         };
         appState.chats.unshift(newP2PChat);
         saveCurrentAccountData();
       }
-      switchMainTab('p2p');
-      openChatRoom(roomId);
+      switchMainTab('p2p'); openChatRoom(roomId);
     }
 
-    // Bio Modal
     function openEditBioModal() {
       document.getElementById('bioInput').value = appState.myBio || '';
       openModal('editBioModal');
     }
     function saveBio() {
-      const val = document.getElementById('bioInput').value.trim();
-      appState.myBio = val;
-      saveCurrentAccountData();
-      updateSideMenuUI();
-      closeModal('editBioModal');
+      appState.myBio = document.getElementById('bioInput').value.trim();
+      saveCurrentAccountData(); updateSideMenuUI(); closeModal('editBioModal');
     }
 
     function openEditNameModal(fieldType) {
       editingFieldType = fieldType;
-      const now = Date.now();
-      const oneMonth = 30 * 24 * 60 * 60 * 1000;
-      const sevenDays = 7 * 24 * 60 * 60 * 1000;
-      let warningText = "";
       if (fieldType === 'username') {
-        document.getElementById('editModalTitle').innerText = "Username ပြောင်းရန် (@username)";
+        document.getElementById('editModalTitle').innerText = "Username ပြောင်းရန်";
         document.getElementById('editNameInput').value = appState.myUsernameHandle;
-        let elapsed = now - appState.lastUsernameChange;
-        if (elapsed < oneMonth) {
-          let daysLeft = Math.ceil((oneMonth - elapsed) / (1000 * 60 * 60 * 24));
-          warningText = `⚠️ Username ကို ၁ လမှ ၁ ခါသာ ပြောင်းနိုင်ပါသည်။ (နောက်ထပ် ${daysLeft} ရက် စောင့်ရန်)`;
-        }
       } else {
-        document.getElementById('editModalTitle').innerText = "သာမန်နာမည် ပြောင်းရန်";
+        document.getElementById('editModalTitle').innerText = "နာမည် ပြောင်းရန်";
         document.getElementById('editNameInput').value = appState.myUserName;
-        let elapsed = now - appState.lastNameChange;
-        if (elapsed < sevenDays) {
-          let daysLeft = Math.ceil((sevenDays - elapsed) / (1000 * 60 * 60 * 24));
-          warningText = `⚠️ နာမည်ကို ၇ ရက်မှ ၁ ခါသာ ပြောင်းနိုင်ပါသည်။ (နောက်ထပ် ${daysLeft} ရက် စောင့်ရန်)`;
-        }
       }
-      document.getElementById('editNameWarning').innerText = warningText;
+      document.getElementById('editNameWarning').innerText = "";
       openModal('editNameModal');
     }
 
     function saveUpdatedName() {
       const val = document.getElementById('editNameInput').value.trim();
-      if(!val) return alert("အချက်အလက် ထည့်ပါ။");
-      const now = Date.now();
-      const oneMonth = 30 * 24 * 60 * 60 * 1000;
-      const sevenDays = 7 * 24 * 60 * 60 * 1000;
-
+      if(!val) return;
       if (editingFieldType === 'username') {
-        if (now - appState.lastUsernameChange < oneMonth) return alert("ရက်သတ်မှတ်ချက် မပြည့်သေးပါ။");
         appState.myUsernameHandle = val.startsWith('@') ? val : '@' + val;
-        appState.lastUsernameChange = now;
       } else {
-        if (now - appState.lastNameChange < sevenDays) return alert("ရက်သတ်မှတ်ချက် မပြည့်သေးပါ။");
         appState.myUserName = val;
-        appState.lastNameChange = now;
       }
       saveCurrentAccountData(); updateSideMenuUI(); closeModal('editNameModal');
     }
@@ -764,10 +664,12 @@
       const name = document.getElementById('newAiName').value.trim();
       if (!name) return alert("AI နာမည် ထည့်ပါ။");
       const newChat = {
-        id: Date.now().toString(), type: 'ai', name: name, age: document.getElementById('newAiAge').value || '18',
-        gender: document.getElementById('newAiGender').value, relation: document.getElementById('newAiRelation').value,
-        pic: tempAiPicBase64, bg: null, messages: [{ role: 'model', content: `ဟိုင်း 👋 ${appState.myUserName}၊ အခုကစပြီး စကားပြောလို့ရပါပြီနော်။` }], lastUpdated: Date.now(),
-        unreadCount: 1, bubbleStyle: null
+        id: Date.now().toString(), type: 'ai', name: name,
+        age: document.getElementById('newAiAge').value || '18',
+        gender: document.getElementById('newAiGender').value,
+        relation: document.getElementById('newAiRelation').value,
+        pic: tempAiPicBase64, messages: [{ role: 'model', content: `ဟိုင်း 👋 ${appState.myUserName}၊ အခုကစပြီး စကားပြောလို့ရပါပြီနော်။` }],
+        lastUpdated: Date.now(), unreadCount: 1
       };
       appState.chats.unshift(newChat); saveCurrentAccountData(); closeModal('newChatModal'); renderChatLists(); openChatRoom(newChat.id);
     }
@@ -775,15 +677,13 @@
     function renderChatLists() {
       appState.chats.sort((a,b) => b.lastUpdated - a.lastUpdated);
       
-      // Render AI Chats
       const aiContainer = document.getElementById('aiTabContainer');
       aiContainer.innerHTML = '';
-      let aiChats = appState.chats.filter(c => c.type !== 'p2p');
-      aiChats.forEach(chat => {
+      appState.chats.filter(c => c.type !== 'p2p').forEach(chat => {
         const lastMsg = chat.messages.length > 0 ? chat.messages[chat.messages.length-1].content.substring(0, 30) : '';
         const unread = chat.unreadCount && chat.unreadCount > 0;
         const div = document.createElement('div'); 
-        div.className = `chat-item ${unread ? 'unread' : ''}`; 
+        div.className = `chat-item`; 
         div.onclick = () => { chat.unreadCount = 0; saveCurrentAccountData(); openChatRoom(chat.id); };
         div.innerHTML = `
           <img src="${chat.pic || defaultAiPic}" class="chat-item-pic">
@@ -796,7 +696,6 @@
         aiContainer.appendChild(div);
       });
 
-      // Render P2P Human Chats
       const p2pContainer = document.getElementById('p2pTabContainer');
       p2pContainer.innerHTML = '';
       let p2pChats = appState.chats.filter(c => c.type === 'p2p');
@@ -807,7 +706,7 @@
           const lastMsg = chat.messages.length > 0 ? chat.messages[chat.messages.length-1].content.substring(0, 30) : 'စကားစပြောပါ...';
           const unread = chat.unreadCount && chat.unreadCount > 0;
           const div = document.createElement('div'); 
-          div.className = `chat-item ${unread ? 'unread' : ''}`; 
+          div.className = `chat-item`; 
           div.onclick = () => { chat.unreadCount = 0; saveCurrentAccountData(); openChatRoom(chat.id); };
           div.innerHTML = `
             <img src="${chat.pic || defaultAiPic}" class="chat-item-pic">
@@ -855,30 +754,26 @@
     function renderChatHistory(chat, preserveScroll = false) {
       const box = document.getElementById('chatHistoryBox'); 
       const currentScroll = box.scrollTop; box.innerHTML = ''; 
-      chat.messages.forEach((m, index) => appendMsgUI(m, index, false));
+      chat.messages.forEach((m, index) => appendMsgUI(m));
       if (preserveScroll) box.scrollTop = currentScroll; else box.scrollTop = box.scrollHeight;
     }
 
-    function appendMsgUI(m, index, autoScroll = true) {
+    function appendMsgUI(m, autoScroll = true) {
       const box = document.getElementById('chatHistoryBox');
-      const rowDiv = document.createElement('div'); rowDiv.className = `msg-row ${m.role === 'user' ? 'user-row' : 'bot-row'}`;
+      const rowDiv = document.createElement('div'); rowDiv.className = `msg-row`;
       const bubbleDiv = document.createElement('div'); 
       bubbleDiv.className = `msg-bubble ${m.role === 'user' ? 'msg-user' : 'msg-bot'}`;
-      
-      let text = m.content;
-      if (text.includes('http') && !text.startsWith('img:')) text = text.replace(/(https?:\/\/[^\s]+)/g, "<a href='$1' target='_blank' style='color:inherit; text-decoration:underline;'>$1</a>");
-      if (text.startsWith('img:')) bubbleDiv.innerHTML = `<img src="${text.substring(4)}" class="msg-img">`;
-      else bubbleDiv.innerHTML = text.replace(/\n/g, '<br>');
-
+      bubbleDiv.innerHTML = m.content.replace(/\n/g, '<br>');
       rowDiv.appendChild(bubbleDiv); box.appendChild(rowDiv); 
       if (autoScroll) box.scrollTop = box.scrollHeight;
     }
 
     function openAiProfileModal() {
       const chat = appState.chats.find(c => c.id === appState.currentChatId);
-      if(chat.type === 'p2p') return alert("P2P သူငယ်ချင်း ချက်တင်ဖြစ်ပါသည်။ User: " + chat.name);
-      document.getElementById('infoAiPic').src = chat.pic || defaultAiPic; document.getElementById('infoAiName').innerText = chat.name;
-      document.getElementById('infoAiDetails').innerText = `${chat.age} yrs • ${chat.gender === 'female' ? 'Female' : 'Male'} • ${chat.relation}`;
+      if(chat.type === 'p2p') return;
+      document.getElementById('infoAiPic').src = chat.pic || defaultAiPic;
+      document.getElementById('infoAiName').innerText = chat.name;
+      document.getElementById('infoAiDetails').innerText = `${chat.age} yrs • ${chat.gender} • ${chat.relation}`;
       openModal('aiProfileModal');
     }
     function deleteCurrentChat() {
@@ -891,22 +786,11 @@
     function saveApiKeys() {
       let keys = [];
       for(let i=0; i<10; i++) {
-        let val = document.getElementById(`apiKey_${i}`).value.trim();
-        if (val) keys.push({ key: val, provider: val.startsWith('gsk_') ? 'groq' : 'gemini' });
+        let val = document.getElementById(`apiKey_${i}`)?.value.trim();
+        if (val) keys.push({ key: val });
       }
       appState.apiKeys = keys; saveCurrentAccountData();
       closeModal('apiModal'); alert("API Keys သိမ်းဆည်းပြီးပါပြီ။");
-    }
-
-    function generateSystemPrompt(chat) {
-      return `You are a conversational AI roleplaying with a human.
-CRITICAL RULES:
-1. The human user's EXACT NAME is "${appState.myUserName}". 
-2. Check the name "${chat.name}". If it is an Anime or Game character, adopt their exact personality. Otherwise, act like a normal Myanmar human.
-3. LANGUAGE: Speak entirely in natural, casual Burmese with youthful spelling.
-4. CRITICAL FORMATTING: You must reply with a sequence of 1 to 5 short, separate messages. Separate each message using EXACTLY "|||".
-5. PICTURES: If explicitly asked for a selfie, include '[SEND_PIC]' in one of the separated messages.
-Your assigned age is ${chat.age}, Gender is ${chat.gender}. Relation: ${chat.relation}.`;
     }
 
     async function sendMessage() {
@@ -919,73 +803,9 @@ Your assigned age is ${chat.age}, Gender is ${chat.gender}. Relation: ${chat.rel
         return;
       }
 
-      // AI Chat Logic
       chat.messages.push({ role: 'user', content: text }); chat.lastUpdated = Date.now(); saveCurrentAccountData();
-      appendMsgUI(chat.messages[chat.messages.length - 1], chat.messages.length - 1, true); 
+      appendMsgUI(chat.messages[chat.messages.length - 1], true); 
       input.value = '';
-
-      if (appState.apiKeys.length === 0) {
-        chat.messages.push({ role: 'model', content: "⚠️ API Key မရှိသေးပါ။ ညာဘက်အပေါ်ထောင့်က '🔑 API' ကို နှိပ်ပြီး ထည့်ပါ။" });
-        saveCurrentAccountData(); appendMsgUI(chat.messages[chat.messages.length - 1], chat.messages.length - 1, true); 
-        return;
-      }
-
-      const box = document.getElementById('chatHistoryBox');
-      const typingDiv = document.createElement('div'); typingDiv.id = "typingIndicator"; typingDiv.className = "typing-indicator"; typingDiv.innerText = "Typing...";
-      box.appendChild(typingDiv); box.scrollTop = box.scrollHeight;
-
-      let historyForAPI = chat.messages.slice(-20);
-      const systemPrompt = generateSystemPrompt(chat);
-      let replyText = ""; let success = false;
-
-      for (let keyObj of appState.apiKeys) {
-        try {
-          let geminiContents = []; let lastRole = null;
-          for (let m of historyForAPI) {
-            let r = m.role === 'user' ? 'user' : 'model';
-            if (geminiContents.length === 0 && r === 'model') continue; 
-            if (r === lastRole) geminiContents[geminiContents.length - 1].parts[0].text += "\n" + m.content;
-            else { geminiContents.push({ role: r, parts: [{ text: m.content }] }); lastRole = r; }
-          }
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${keyObj.key}`, {
-            method: 'POST', headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ systemInstruction: { parts: [{ text: systemPrompt }] }, contents: geminiContents })
-          });
-          const data = await res.json();
-          if (data.candidates) { replyText = data.candidates[0].content.parts[0].text.trim(); success = true; break; }
-        } catch (e) { console.error(e); }
-      }
-
-      const tInd = document.getElementById("typingIndicator"); if(tInd) tInd.remove();
-
-      if (!success) {
-        chat.messages.push({ role: 'model', content: "⚠️ အင်တာနက် သို့မဟုတ် API ချိတ်ဆက်မှု အခက်အခဲဖြစ်နေပါသည်။" });
-        chat.unreadCount = (chat.unreadCount || 0) + 1;
-        chat.lastUpdated = Date.now(); saveCurrentAccountData(); 
-        appendMsgUI(chat.messages[chat.messages.length - 1], chat.messages.length - 1, true); 
-        return;
-      }
-
-      let hasPic = replyText.includes('[SEND_PIC]');
-      let cleanText = replyText.replace(/\[.*?\]/g, '').replace(/\\n/g, '').trim();
-      let splitMessages = cleanText.split('|||').map(t => t.trim()).filter(t => t.length > 0);
-      
-      if (hasPic) {
-        const p = encodeURIComponent(`A realistic selfie of a ${chat.age} year old Asian ${chat.gender==='female'?'girl':'boy'}, casual, front facing`);
-        splitMessages.push(`img:https://image.pollinations.ai/prompt/${p}?width=512&height=512&nologo=true`);
-      }
-
-      let delay = 0;
-      splitMessages.forEach((msgPart) => {
-        setTimeout(() => {
-          chat.messages.push({ role: 'model', content: msgPart });
-          chat.unreadCount = (chat.unreadCount || 0) + 1; 
-          chat.lastUpdated = Date.now();
-          saveCurrentAccountData(); 
-          appendMsgUI(chat.messages[chat.messages.length - 1], chat.messages.length - 1, true); 
-        }, delay);
-        delay += 1200; 
-      });
     }
   </script>
 </body>
