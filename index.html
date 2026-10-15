@@ -46,21 +46,25 @@
     .chat-item-lastmsg { font-size: 13.5px; color: #8e9297; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .unread-badge { background: #5288c1; color: white; border-radius: 50%; padding: 2px 7px; font-size: 11px; font-weight: bold; margin-left: auto; }
     
-    /* Telegram Floating Action Button (for new chat / group) */
     .fab-btn { position: absolute; bottom: 25px; right: 25px; width: 56px; height: 56px; border-radius: 50%; background: #5288c1; color: white; border: none; font-size: 24px; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.4); cursor: pointer; z-index: 15; }
 
     /* Profile Screen Layout */
     .profile-container { flex: 1; overflow-y: auto; padding: 20px; text-align: center; }
-    .profile-banner { width: 100%; height: 130px; background-size: cover; background-position: center; border-radius: 12px; margin-bottom: -50px; position: relative; border: 1px solid #2f3136; }
-    .profile-big-pic { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 0 auto 10px auto; border: 3px solid #1a1b1e; position: relative; z-index: 2; background: #2f3136; }
+    .profile-banner { width: 100%; height: 130px; background-size: cover; background-position: center; border-radius: 12px; margin-bottom: -50px; position: relative; border: 1px solid #2f3136; cursor: pointer; }
+    .profile-big-pic { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 0 auto 10px auto; border: 3px solid #1a1b1e; position: relative; z-index: 2; background: #2f3136; cursor: pointer; }
     .profile-name { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 2px; }
     .profile-status { font-size: 13px; color: #8e9297; margin-bottom: 20px; }
     .profile-actions-grid { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
     .profile-action-btn { background: #2f3136; border-radius: 14px; padding: 12px 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: #E4E6EB; flex: 1; max-width: 100px; }
     .profile-action-btn span { font-size: 18px; }
-    .profile-info-card { background: #222327; border-radius: 14px; padding: 15px; text-align: left; margin-bottom: 12px; }
+    .profile-info-card { background: #222327; border-radius: 14px; padding: 15px; text-align: left; margin-bottom: 12px; cursor: pointer; }
     .profile-info-title { font-size: 12px; color: #8e9297; margin-bottom: 4px; }
     .profile-info-val { font-size: 15px; color: #fff; word-break: break-word; }
+
+    /* Accounts Switcher in Settings/Profile */
+    .account-switcher-row { display: flex; gap: 10px; align-items: center; margin-top: 15px; justify-content: center; }
+    .account-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; cursor: pointer; border: 2px solid transparent; opacity: 0.6; }
+    .account-avatar.active { border-color: #5288c1; opacity: 1; transform: scale(1.05); }
 
     /* Chat Room & Swipe to Reply */
     #chatRoomScreen { z-index: 20; }
@@ -125,6 +129,12 @@
     <!-- Tab 3: Settings -->
     <div id="settingsTabContainer" class="chat-list-container hidden">
       <div style="padding: 10px;">
+        <div style="padding:14px; background:#222327; border-radius:12px; margin-bottom:15px;">
+          <div style="font-weight:600; color:#fff; margin-bottom:8px;">Switch Accounts (အကောင့်ပြောင်းရန်)</div>
+          <div class="account-switcher-row" id="accountsListContainer"></div>
+          <button class="btn secondary" style="margin-top:10px; font-size:13px; padding:8px;" onclick="loginWithGoogle()">+ အကောင့်အသစ် ထပ်ထည့်ရန်</button>
+        </div>
+
         <div class="settings-list-item" onclick="openApiModal()" style="display:flex; align-items:center; padding:14px; gap:15px; cursor:pointer; border-bottom:1px solid #2f3136;">
           <span style="font-size:20px;">🔑</span>
           <div><div style="font-weight:600; color:#fff;">AI API Keys</div><div style="font-size:12px; color:#8e9297;">Gemini API Keys ထည့်ရန်</div></div>
@@ -139,7 +149,7 @@
     <!-- Tab 4: Profile Screen -->
     <div id="profileTabContainer" class="profile-container hidden">
       <div id="profileBannerView" class="profile-banner" onclick="document.getElementById('bannerUpload').click()"></div>
-      <input type="file" id="bannerUpload" accept="image/*,video/*" class="hidden" onchange="handleBannerUpload(event)">
+      <input type="file" id="bannerUpload" accept="image/*" class="hidden" onchange="handleBannerUpload(event)">
 
       <input type="file" id="myProfileUpload" accept="image/*,video/*" class="hidden" onchange="handleProfileMediaUpload(event)">
       <img src="" id="profileScreenPic" class="profile-big-pic" onclick="document.getElementById('myProfileUpload').click()">
@@ -381,7 +391,7 @@
       switchAccount(user.uid);
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('mainScreen').classList.remove('hidden');
-      renderChatLists(); updateProfileUI();
+      renderChatLists(); updateProfileUI(); renderAccountSwitcher();
       
       window.addEventListener('beforeunload', () => {
         window.syncUserProfileToCloud(currentUid, appState.myUserName, appState.myUsernameHandle, appState.myProfilePic, appState.myBio, appState.myPhone, Date.now());
@@ -403,7 +413,7 @@
         appState.apiKeys = acc.apiKeys || [];
         window.syncUserProfileToCloud(uid, appState.myUserName, appState.myUsernameHandle, appState.myProfilePic, appState.myBio, appState.myPhone, Date.now());
       }
-      renderChatLists(); updateProfileUI();
+      renderChatLists(); updateProfileUI(); renderAccountSwitcher();
     }
 
     function saveCurrentAccountData() {
@@ -420,12 +430,24 @@
 
     function saveAccounts() { localStorage.setItem('ai_messenger_accounts', JSON.stringify(accounts)); }
 
+    function renderAccountSwitcher() {
+      const container = document.getElementById('accountsListContainer');
+      container.innerHTML = '';
+      accounts.forEach(acc => {
+        let img = document.createElement('img');
+        img.src = acc.pic || defaultPic;
+        img.className = `account-avatar ${acc.uid === currentUid ? 'active' : ''}`;
+        img.onclick = () => { saveCurrentAccountData(); switchAccount(acc.uid); };
+        container.appendChild(img);
+      });
+    }
+
     window.onload = () => {
       if (currentUid && accounts.some(a => a.uid === currentUid)) {
         switchAccount(currentUid);
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('mainScreen').classList.remove('hidden');
-        renderChatLists(); updateProfileUI();
+        renderChatLists(); updateProfileUI(); renderAccountSwitcher();
       } else {
         document.getElementById('loginScreen').classList.remove('hidden');
       }
@@ -519,8 +541,7 @@
 
     function renderChatLists() {
       const container = document.getElementById('chatsTabContainer');
-      // Keep FAB button
-      let fabHTML = container.querySelector('.fab-btn').outerHTML;
+      let fabHTML = container.querySelector('.fab-btn') ? container.querySelector('.fab-btn').outerHTML : `<button class="fab-btn" onclick="openNewGroupModal()" title="ဂရုအသစ်">✎</button>`;
       container.innerHTML = fabHTML;
 
       if (appState.chats.length === 0) {
@@ -585,14 +606,11 @@
         contentHtml += m.content.replace(/\n/g, '<br>');
         d.innerHTML = contentHtml;
 
-        // Swipe right to reply listener
         let startX = 0;
         d.ontouchstart = e => { startX = e.touches[0].clientX; };
         d.ontouchend = e => {
           let endX = e.changedTouches[0].clientX;
-          if (endX - startX > 60) {
-            setReplyMessage(m.content);
-          }
+          if (endX - startX > 60) setReplyMessage(m.content);
         };
 
         row.appendChild(d);
@@ -626,20 +644,16 @@
         chat.messages.push({ senderId: currentUid, role: 'user', content: text, replyTo: reply });
         chat.lastUpdated = Date.now(); saveCurrentAccountData();
         
-        // AI Group Logic: Only responds if tagged (@AI) or direct message
-        if (chat.type === 'ai_group') {
-          if (text.toLowerCase().includes('@ai') || text.toLowerCase().includes('ai')) {
-            setTimeout(() => {
-              chat.messages.push({ senderId: 'ai', role: 'model', content: `ဟိုင်းပါ 👋 ဖြေကြားပေးပါမယ်ခင်ဗျာ။` });
-              renderChatHistory(chat);
-            }, 1000);
-          }
+        if (chat.type === 'ai_group' && (text.toLowerCase().includes('@ai') || text.toLowerCase().includes('ai'))) {
+          setTimeout(() => {
+            chat.messages.push({ senderId: 'ai', role: 'model', content: `ဟိုင်းပါ 👋 ဖြေကြားပေးပါမယ်ခင်ဗျာ။` });
+            renderChatHistory(chat);
+          }, 1000);
         }
         renderChatHistory(chat);
       }
     }
 
-    // Media & Profile handlers (Live Photo / Video 5s / Banner)
     function handleProfileMediaUpload(e) {
       const file = e.target.files[0]; if (!file) return;
       if (file.type.startsWith('video/')) {
@@ -654,12 +668,12 @@
           video.onseeked = () => {
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             appState.myProfilePic = canvas.toDataURL('image/jpeg');
-            saveCurrentAccountData(); updateProfileUI();
+            saveCurrentAccountData(); updateProfileUI(); renderAccountSwitcher();
           };
         };
       } else {
         const reader = new FileReader();
-        reader.onload = ev => { appState.myProfilePic = ev.target.result; saveCurrentAccountData(); updateProfileUI(); };
+        reader.onload = ev => { appState.myProfilePic = ev.target.result; saveCurrentAccountData(); updateProfileUI(); renderAccountSwitcher(); };
         reader.readAsDataURL(file);
       }
     }
@@ -671,7 +685,6 @@
       reader.readAsDataURL(file);
     }
 
-    // Group creation logic with API check
     function openNewGroupModal() { openModal('newGroupModal'); }
     function createGroupChat() {
       const name = document.getElementById('newGroupNameInput').value.trim();
@@ -695,7 +708,6 @@
     function openPhoneModal() { document.getElementById('phoneInput').value = appState.myPhone; openModal('phoneModal'); }
     function savePhoneNumber() { appState.myPhone = document.getElementById('phoneInput').value.trim(); saveCurrentAccountData(); updateProfileUI(); closeModal('phoneModal'); }
 
-    // Modal Helpers
     function openModal(id) { document.getElementById(id).classList.add('active'); }
     function closeModal(id) { document.getElementById(id).classList.remove('active'); }
     function closeModalOnOutsideClick(e, id) { if (e.target.id === id) closeModal(id); }
