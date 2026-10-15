@@ -3,152 +3,202 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>AI & P2P Messenger Ultimate</title>
+  <title>Telegram Style AI & P2P Messenger</title>
   <style>
     * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-    body, html { margin: 0; padding: 0; height: 100%; width: 100%; background-color: #e0e5ec; color: #333; overflow: hidden; transition: background 0.3s, color 0.3s; }
-    
-    body.dark-theme { background-color: #1a1b1e; color: #E4E6EB; }
-    body.dark-theme .screen, 
-    body.dark-theme .modal-content, 
-    body.dark-theme .main-header, 
-    body.dark-theme .chat-header, 
-    body.dark-theme .chat-input-area,
-    body.dark-theme .side-menu,
-    body.dark-theme .bottom-nav { background-color: #1a1b1e; color: #E4E6EB; border: none; box-shadow: none; }
-    
-    body.dark-theme .msg-bot { background: linear-gradient(145deg, #1c1d20, #17181b); color: #E4E6EB; box-shadow: 4px 4px 8px #121315, -4px -4px 8px #222327; }
-    body.dark-theme .input-control, 
-    body.dark-theme .chat-input { background: #1a1b1e; color: #E4E6EB; box-shadow: inset 3px 3px 6px #121315, inset -3px -3px 6px #222327; border: none; }
-    body.dark-theme .icon-btn, body.dark-theme .theme-switch-box { background: linear-gradient(145deg, #1c1d20, #17181b); box-shadow: 3px 3px 6px #121315, -3px -3px 6px #222327; color: #E4E6EB; }
-    body.dark-theme .btn.secondary { background: linear-gradient(145deg, #1c1d20, #17181b); color: #E4E6EB; box-shadow: 4px 4px 8px #121315, -4px -4px 8px #222327; }
+    body, html { margin: 0; padding: 0; height: 100%; width: 100%; background-color: #1a1b1e; color: #E4E6EB; overflow: hidden; }
 
     .hidden { display: none !important; }
-    .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #e0e5ec; display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 10; }
+    .screen { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: #1a1b1e; display: flex; flex-direction: column; transition: transform 0.3s ease; z-index: 10; }
     .slide-in-right { transform: translateX(100%); }
     .slide-in-right.active { transform: translateX(0); }
     
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); z-index: 100; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); z-index: 100; display: flex; justify-content: center; align-items: center; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
     
-    .modal-content { background: #e0e5ec; width: 90%; max-width: 400px; border-radius: 25px; padding: 25px; box-shadow: 9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5); max-height: 90vh; overflow-y: auto; transform: translateY(20px); transition: transform 0.3s; }
-    .modal-overlay.active .modal-content { transform: translateY(0); }
+    .modal-content { background: #222327; width: 90%; max-width: 400px; border-radius: 20px; padding: 25px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); max-height: 90vh; overflow-y: auto; color: #E4E6EB; }
     
-    .side-menu-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-    .side-menu-overlay.active { opacity: 1; pointer-events: auto; }
-    .side-menu { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #e0e5ec; z-index: 210; box-shadow: 5px 0 15px rgba(0,0,0,0.2); transition: left 0.3s ease; display: flex; flex-direction: column; padding: 20px; overflow-y: auto; }
-    .side-menu.active { left: 0; }
-    
-    .side-menu-header { border-bottom: 1px solid rgba(0,0,0,0.1); padding-bottom: 15px; margin-bottom: 15px; text-align: center; }
-    .side-profile-pic { width: 65px; height: 65px; border-radius: 50%; object-fit: cover; margin-bottom: 10px; box-shadow: 4px 4px 8px rgb(163,177,198,0.6), -4px -4px 8px rgba(255,255,255, 0.6); cursor: pointer; }
-    .side-names { font-weight: 700; font-size: 17px; margin-bottom: 2px; }
-    .side-username { font-size: 13px; color: #65676B; margin-bottom: 5px; }
-    .side-bio { font-size: 13px; color: #555; font-style: italic; margin-bottom: 10px; word-break: break-word; }
-    
-    .accounts-list { display: flex; gap: 10px; align-items: center; margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(0,0,0,0.1); }
-    .account-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; cursor: pointer; border: 2px solid transparent; opacity: 0.6; transition: 0.2s; }
-    .account-avatar.active { border-color: #0078FF; opacity: 1; transform: scale(1.05); }
-    .add-account-btn { width: 40px; height: 40px; border-radius: 50%; background: #e0e5ec; border: 2px dashed #0078FF; display: flex; justify-content: center; align-items: center; font-size: 20px; color: #0078FF; cursor: pointer; box-shadow: 3px 3px 6px rgb(163,177,198,0.6); }
+    /* Telegram Bottom Nav (4 Tabs) */
+    .bottom-nav { display: flex; height: 60px; background: #1a1b1e; border-top: 1px solid rgba(255,255,255,0.08); z-index: 5; }
+    .nav-tab { flex: 1; border: none; background: none; font-size: 11px; font-weight: 600; color: #8e9297; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; transition: 0.2s; }
+    .nav-tab.active { color: #5288c1; }
+    .nav-tab img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+    .nav-tab span.icon { font-size: 20px; }
 
-    .bottom-nav { display: flex; height: 60px; background: #e0e5ec; border-top: 1px solid rgba(0,0,0,0.08); box-shadow: 0 -4px 10px rgba(0,0,0,0.03); z-index: 5; }
-    .nav-tab { flex: 1; border: none; background: none; font-size: 14px; font-weight: 700; color: #65676B; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; transition: 0.2s; }
-    .nav-tab.active { color: #0078FF; }
-
-    .btn { background: #0078FF; color: white; border: none; padding: 14px; border-radius: 20px; font-weight: 600; font-size: 16px; cursor: pointer; width: 100%; margin-top: 15px; box-shadow: 4px 4px 10px rgba(0, 120, 255, 0.3), -4px -4px 10px rgba(255, 255, 255, 0.8); transition: all 0.2s ease; }
-    .btn:active { box-shadow: inset 4px 4px 10px rgba(0, 91, 181, 0.5), inset -4px -4px 10px rgba(50, 150, 255, 0.5); transform: scale(0.98); }
-    .btn.secondary { background: #e0e5ec; color: #333; box-shadow: 6px 6px 12px rgb(163,177,198,0.6), -6px -6px 12px rgba(255,255,255, 0.6); }
+    .btn { background: #5288c1; color: white; border: none; padding: 12px; border-radius: 12px; font-weight: 600; font-size: 15px; cursor: pointer; width: 100%; margin-top: 12px; transition: 0.2s; }
+    .btn.secondary { background: #2f3136; color: #E4E6EB; }
     
-    .input-control { width: 100%; padding: 14px; border: none; border-radius: 15px; font-size: 16px; background: #e0e5ec; outline: none; margin-bottom: 12px; box-shadow: inset 5px 5px 10px rgb(163,177,198,0.6), inset -5px -5px 10px rgba(255,255,255, 0.6); }
+    .input-control { width: 100%; padding: 12px 15px; border: none; border-radius: 12px; font-size: 15px; background: #141517; color: #E4E6EB; outline: none; margin-bottom: 12px; border: 1px solid #2f3136; }
     
-    #loginScreen { z-index: 3000; justify-content: center; align-items: center; padding: 30px; text-align: center; background: #e0e5ec; }
+    #loginScreen { z-index: 3000; justify-content: center; align-items: center; padding: 30px; text-align: center; background: #1a1b1e; }
     
-    .main-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #e0e5ec; box-shadow: 0 4px 10px rgba(0,0,0,0.05); z-index: 5; }
+    .main-header { display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; background: #1a1b1e; border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 5; }
     .header-left { display: flex; align-items: center; gap: 15px; }
-    .header-actions { display: flex; gap: 10px; align-items: center; }
+    .header-actions { display: flex; gap: 12px; align-items: center; }
     
-    .icon-btn { width: 45px; height: 45px; border-radius: 50%; background: #e0e5ec; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 20px; border: none; box-shadow: 5px 5px 10px rgb(163,177,198,0.6), -5px -5px 10px rgba(255,255,255, 0.6); }
+    .icon-btn { width: 40px; height: 40px; border-radius: 50%; background: #2f3136; display: flex; justify-content: center; align-items: center; cursor: pointer; font-size: 18px; border: none; color: #E4E6EB; }
     
     .chat-list-container { flex: 1; overflow-y: auto; padding: 10px; }
-    .chat-item { display: flex; align-items: center; padding: 12px; margin-bottom: 10px; border-radius: 15px; cursor: pointer; transition: all 0.2s; position: relative; }
-    .chat-item-pic { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 15px; box-shadow: 3px 3px 6px rgb(163,177,198,0.6), -3px -3px 6px rgba(255,255,255, 0.6); }
+    .chat-item { display: flex; align-items: center; padding: 10px 12px; margin-bottom: 4px; border-radius: 12px; cursor: pointer; transition: 0.2s; position: relative; }
+    .chat-item:hover { background: rgba(255,255,255,0.03); }
+    .chat-item-pic { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; margin-right: 14px; }
     .chat-item-info { flex: 1; overflow: hidden; }
-    .chat-item-name { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
-    .chat-item-lastmsg { font-size: 14px; color: #65676B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    
-    .unread-badge { background: #FF3B30; color: white; border-radius: 50%; padding: 2px 7px; font-size: 12px; font-weight: bold; margin-left: auto; }
+    .chat-item-name { font-size: 16px; font-weight: 600; margin-bottom: 4px; color: #fff; display: flex; align-items: center; gap: 5px; }
+    .chat-item-lastmsg { font-size: 13.5px; color: #8e9297; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .unread-badge { background: #5288c1; color: white; border-radius: 50%; padding: 2px 7px; font-size: 11px; font-weight: bold; margin-left: auto; }
+    .pinned-icon { font-size: 12px; color: #8e9297; margin-left: auto; }
 
-    #searchScreen { z-index: 25; }
-    .search-box-container { padding: 15px; display: flex; gap: 10px; background: #e0e5ec; box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
+    /* Long Press Action Menu */
+    .action-menu-modal { position: fixed; bottom: 0; left: 0; width: 100%; background: #222327; border-radius: 20px 20px 0 0; padding: 20px; z-index: 500; transform: translateY(100%); transition: transform 0.3s ease; }
+    .action-menu-modal.active { transform: translateY(0); }
+    .action-menu-item { padding: 15px; font-size: 16px; font-weight: 500; display: flex; align-items: center; gap: 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .action-menu-item:last-child { border-bottom: none; }
+    .action-menu-item.danger { color: #ff4757; }
 
+    /* Profile Screen Layout (As in reference image) */
+    .profile-container { flex: 1; overflow-y: auto; padding: 20px; text-align: center; }
+    .profile-big-pic { width: 100px; height: 100px; border-radius: 50%; object-fit: cover; margin: 10px auto; border: 2px solid #5288c1; }
+    .profile-name { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 2px; }
+    .profile-status { font-size: 13px; color: #8e9297; margin-bottom: 20px; }
+    .profile-actions-grid { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
+    .profile-action-btn { background: #2f3136; border-radius: 14px; padding: 12px 18px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; font-size: 12px; color: #E4E6EB; flex: 1; max-width: 100px; }
+    .profile-action-btn span { font-size: 18px; }
+    .profile-info-card { background: #222327; border-radius: 14px; padding: 15px; text-align: left; margin-bottom: 12px; }
+    .profile-info-title { font-size: 12px; color: #8e9297; margin-bottom: 4px; }
+    .profile-info-val { font-size: 15px; color: #fff; word-break: break-word; }
+
+    /* Settings Screen Layout */
+    .settings-list-item { display: flex; align-items: center; padding: 14px 15px; gap: 15px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.03); }
+    .settings-list-item:hover { background: rgba(255,255,255,0.02); }
+    .settings-icon { font-size: 20px; width: 30px; text-align: center; }
+
+    /* Chat Room */
     #chatRoomScreen { z-index: 20; }
-    .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #e0e5ec; box-shadow: 0 4px 10px rgba(0,0,0,0.05); z-index: 5; }
+    .chat-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; background: #1a1b1e; border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 5; }
     .chat-header-left { display: flex; align-items: center; gap: 12px; }
-    .back-btn { font-size: 24px; color: #0078FF; cursor: pointer; border: none; background: none; padding: 5px; font-weight: bold; }
-    .chat-ai-pic { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; cursor: pointer; box-shadow: 2px 2px 5px rgb(163,177,198,0.6), -2px -2px 5px rgba(255,255,255, 0.6); }
-    .chat-header-name { font-size: 18px; font-weight: 700; }
-    .api-settings-btn { font-size: 14px; font-weight: 600; color: #0078FF; cursor: pointer; background: #e0e5ec; padding: 8px 15px; border-radius: 20px; border: none; box-shadow: 4px 4px 8px rgb(163,177,198,0.6), -4px -4px 8px rgba(255,255,255, 0.6); }
+    .back-btn { font-size: 22px; color: #5288c1; cursor: pointer; border: none; background: none; padding: 0; font-weight: bold; }
+    .chat-ai-pic { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; cursor: pointer; }
+    .chat-header-name { font-size: 17px; font-weight: 600; color: #fff; }
     
-    .chat-history { flex: 1; overflow-y: auto; padding: 20px 15px; display: flex; flex-direction: column; gap: 15px; background-size: cover; background-position: center; position: relative; scroll-behavior: smooth; }
-    .msg-row { display: flex; flex-direction: column; position: relative; }
-    .msg-bubble { max-width: 80%; padding: 12px 16px; font-size: 15px; line-height: 1.5; word-break: break-word; position: relative; }
-    .msg-user { background: linear-gradient(145deg, #0078FF, #006ce6); color: white; align-self: flex-end; border-radius: 20px 20px 4px 20px; box-shadow: 4px 4px 10px rgba(0, 120, 255, 0.3); }
-    .msg-bot { background: #e0e5ec; color: #333; align-self: flex-start; border-radius: 20px 20px 20px 4px; box-shadow: 5px 5px 10px rgb(163,177,198,0.5), -5px -5px 10px rgba(255,255,255, 0.7); }
+    .chat-history { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 10px; background: #0e0f11; }
+    .msg-bubble { max-width: 75%; padding: 10px 14px; font-size: 14.5px; line-height: 1.4; word-break: break-word; border-radius: 14px; }
+    .msg-user { background: #2b5278; color: white; align-self: flex-end; border-bottom-right-radius: 4px; }
+    .msg-bot { background: #18191d; color: #E4E6EB; align-self: flex-start; border-bottom-left-radius: 4px; }
     
-    .chat-input-area { padding: 15px; background: #e0e5ec; display: flex; gap: 12px; align-items: center; box-shadow: 0 -4px 10px rgba(0,0,0,0.03); z-index: 5; }
-    .chat-input { flex: 1; background: #e0e5ec; border: none; padding: 14px 20px; border-radius: 25px; font-size: 15px; outline: none; box-shadow: inset 4px 4px 8px rgb(163,177,198,0.6), inset -4px -4px 8px rgba(255,255,255, 0.6); }
-    .send-btn { color: #0078FF; background: #e0e5ec; border: none; width: 45px; height: 45px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 20px; cursor: pointer; box-shadow: 4px 4px 8px rgb(163,177,198,0.6), -4px -4px 8px rgba(255,255,255, 0.6); }
-    
-    .img-upload-box { width: 100px; height: 100px; border-radius: 50%; background: #e0e5ec; border: none; margin: 0 auto 15px auto; display: flex; justify-content: center; align-items: center; cursor: pointer; overflow: hidden; position: relative; box-shadow: inset 5px 5px 10px rgb(163,177,198,0.6), inset -5px -5px 10px rgba(255,255,255, 0.6); }
-    .img-upload-box img { width: 100%; height: 100%; object-fit: cover; }
-    
-    .api-keys-grid { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; padding: 5px; }
-    .theme-switch-box { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #e0e5ec; border-radius: 15px; margin-bottom: 15px; box-shadow: 5px 5px 10px rgb(163,177,198,0.5), -5px -5px 10px rgba(255,255,255, 0.6); }
-    .typing-indicator { align-self: flex-start; padding: 10px 15px; background: #e0e5ec; border-radius: 20px; box-shadow: 3px 3px 8px rgb(163,177,198,0.5), -3px -3px 8px rgba(255,255,255, 0.7); font-size: 14px; font-weight: bold; color: #888; }
+    .chat-input-area { padding: 12px 15px; background: #1a1b1e; display: flex; gap: 10px; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); }
+    .chat-input { flex: 1; background: #141517; border: 1px solid #2f3136; padding: 12px 18px; border-radius: 22px; font-size: 14.5px; color: #fff; outline: none; }
+    .send-btn { color: #5288c1; background: none; border: none; font-size: 22px; cursor: pointer; }
   </style>
 </head>
 <body>
 
   <!-- Screen 0: Google Login Required Screen -->
   <div id="loginScreen" class="screen">
-    <div style="font-size: 80px; margin-bottom: 20px;">🌐</div>
-    <h2 style="margin-top:0;">AI & P2P Messenger သို့ ကြိုဆိုပါတယ်</h2>
-    <p style="color: #65676B; font-size: 15px; margin-bottom: 30px; padding: 0 20px;">
-      ဆက်လက်အသုံးပြုရန် သင့်ရဲ့ Google အကောင့်ဖြင့် ဝင်ရောက်ပေးပါ။
+    <div style="font-size: 70px; margin-bottom: 15px;">🌐</div>
+    <h2 style="margin-top:0; color:#fff;">Telegram AI & P2P Messenger</h2>
+    <p style="color: #8e9297; font-size: 14px; margin-bottom: 25px; padding: 0 20px;">
+      စတင်အသုံးပြုရန် သင့်ရဲ့ Google အကောင့်ဖြင့် ဝင်ရောက်ပေးပါ။
     </p>
-    <button class="btn" onclick="loginWithGoogle()" style="background: #4285F4; color: white; width: 80%; max-width: 320px; margin: 0 auto; display: flex; justify-content: center; align-items: center; gap: 12px; font-size: 16px;">
-      🌐 Google အကောင့်ဖြင့် ဝင်မည်
+    <button class="btn" onclick="loginWithGoogle()" style="background: #4285F4; color: white; width: 80%; max-width: 300px; margin: 0 auto; display: flex; justify-content: center; align-items: center; gap: 10px;">
+      🌐 Google ဖြင့် ဝင်မည်
     </button>
   </div>
 
-  <!-- Screen 1: Main Container with Bottom Navigation Tabs -->
+  <!-- Screen 1: Main Container with Telegram 4-Tab Bottom Navigation -->
   <div id="mainScreen" class="screen hidden">
     <div class="main-header">
       <div class="header-left">
-        <button class="icon-btn" onclick="toggleSideMenu()">☰</button>
-        <span id="headerTitle" style="font-size: 19px; font-weight: 700;">AI Chats</span>
+        <span id="headerTitle" style="font-size: 18px; font-weight: 700; color:#fff;">Chats</span>
       </div>
       <div class="header-actions">
+        <!-- Single Search Button for P2P/Global -->
         <button id="searchUsersBtn" class="icon-btn hidden" onclick="openSearchScreen()" title="User ရှာရန်">🔍</button>
-        <button class="icon-btn" onclick="openSettingsModal()" title="Settings">⚙️</button>
         <button id="headerAddBtn" class="icon-btn" onclick="openNewChatModal()" title="AI Chat အသစ်">📝</button>
       </div>
     </div>
 
-    <!-- Tab 1: AI Chats List -->
-    <div id="aiTabContainer" class="chat-list-container"></div>
+    <!-- Tab 1: Chats List (AI + P2P Combined) -->
+    <div id="chatsTabContainer" class="chat-list-container"></div>
     
-    <!-- Tab 2: P2P Human Chats List -->
-    <div id="p2pTabContainer" class="chat-list-container hidden"></div>
+    <!-- Tab 2: Contacts Screen -->
+    <div id="contactsTabContainer" class="chat-list-container hidden">
+      <div style="padding:15px;">
+        <input type="text" class="input-control" placeholder="🔍 သူငယ်ချင်းများ ရှာရန်..." oninput="searchContacts(this.value)">
+      </div>
+      <div id="contactsListResults"></div>
+    </div>
 
-    <!-- Bottom Navigation Bar (2 Tabs) -->
+    <!-- Tab 3: Settings Screen -->
+    <div id="settingsTabContainer" class="chat-list-container hidden">
+      <div style="padding: 10px;">
+        <div class="settings-list-item" onclick="openApiModal()">
+          <span class="settings-icon">🔑</span>
+          <div style="flex:1;">
+            <div style="font-weight:600; color:#fff;">AI API Keys</div>
+            <div style="font-size:12px; color:#8e9297;">Gemini / Groq API Key ထည့်ရန်</div>
+          </div>
+        </div>
+        <div class="settings-list-item" onclick="logoutGoogle()">
+          <span class="settings-icon" style="color:#ff4757;">🚪</span>
+          <div style="flex:1;">
+            <div style="font-weight:600; color:#ff4757;">Log Out (အကောင့်ထွက်မည်)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Profile Screen (As in reference screenshot) -->
+    <div id="profileTabContainer" class="profile-container hidden">
+      <input type="file" id="myProfileUpload" accept="image/*" class="hidden" onchange="handleMyProfileUpload(event)">
+      <img src="" id="profileScreenPic" class="profile-big-pic" onclick="document.getElementById('myProfileUpload').click()">
+      <div class="profile-name" id="profileScreenName">Name</div>
+      <div class="profile-status">online</div>
+
+      <div class="profile-actions-grid">
+        <div class="profile-action-btn" onclick="document.getElementById('myProfileUpload').click()">
+          <span>📷</span> Set Photo
+        </div>
+        <div class="profile-action-btn" onclick="openEditNameModal('name')">
+          <span>✏️</span> Edit Info
+        </div>
+        <div class="profile-action-btn" onclick="switchMainTab('settings')">
+          <span>⚙️</span> Settings
+        </div>
+      </div>
+
+      <div class="profile-info-card">
+        <div class="profile-info-title">Mobile</div>
+        <div class="profile-info-val" id="profileScreenMobile">+95 9691888186</div>
+      </div>
+
+      <div class="profile-info-card" onclick="openEditBioModal()">
+        <div class="profile-info-title">Bio</div>
+        <div class="profile-info-val" id="profileScreenBio">Bio ရေးရန်... ✏️</div>
+      </div>
+
+      <div class="profile-info-card" onclick="openEditNameModal('username')">
+        <div class="profile-info-title">Username</div>
+        <div class="profile-info-val" id="profileScreenUsername">@username ✏️</div>
+      </div>
+    </div>
+
+    <!-- Telegram 4-Tab Bottom Navigation Bar -->
     <div class="bottom-nav">
-      <button class="nav-tab active" id="tabAiBtn" onclick="switchMainTab('ai')">
-        <span>🤖</span>
-        <span>AI Chats</span>
+      <button class="nav-tab active" id="tabChatsBtn" onclick="switchMainTab('chats')">
+        <span class="icon">💬</span>
+        <span>Chats</span>
       </button>
-      <button class="nav-tab" id="tabP2pBtn" onclick="switchMainTab('p2p')">
-        <span>👥</span>
-        <span>လူအချင်းချင်း</span>
+      <button class="nav-tab" id="tabContactsBtn" onclick="switchMainTab('contacts')">
+        <span class="icon">👥</span>
+        <span>Contacts</span>
+      </button>
+      <button class="nav-tab" id="tabSettingsBtn" onclick="switchMainTab('settings')">
+        <span class="icon">⚙️</span>
+        <span>Settings</span>
+      </button>
+      <button class="nav-tab" id="tabProfileBtn" onclick="switchMainTab('profile')">
+        <img id="bottomNavProfilePic" src="">
+        <span>Profile</span>
       </button>
     </div>
   </div>
@@ -158,33 +208,20 @@
     <div class="main-header">
       <div class="header-left">
         <button class="back-btn" onclick="closeSearchScreen()">❮</button>
-        <span style="font-size: 19px; font-weight: 700;">User ရှာရန်</span>
+        <span style="font-size: 18px; font-weight: 700; color:#fff;">User ရှာရန်</span>
       </div>
     </div>
-    <div class="search-box-container">
-      <input type="text" id="userSearchInput" class="input-control" placeholder="နာမည် (သို့) @username ဖြင့်ရှာရန်..." style="margin-bottom:0;" oninput="searchUsers(this.value)">
+    <div style="padding: 15px;">
+      <input type="text" id="userSearchInput" class="input-control" placeholder="နာမည် သို့မဟုတ် @username ဖြင့်ရှာရန်..." oninput="searchUsers(this.value)" style="margin-bottom:0;">
     </div>
     <div class="chat-list-container" id="searchResultsContainer"></div>
   </div>
 
-  <!-- Side Menu Drawer -->
-  <div id="sideMenuOverlay" class="side-menu-overlay" onclick="toggleSideMenu()"></div>
-  <div id="sideMenu" class="side-menu">
-    <div class="side-menu-header">
-      <input type="file" id="myProfileUpload" accept="image/*" class="hidden" onchange="handleMyProfileUpload(event)">
-      <img src="" id="sideProfilePic" class="side-profile-pic" onclick="document.getElementById('myProfileUpload').click()">
-      <div class="side-names" id="sideDisplayName" onclick="openEditNameModal('name')">Name ✏️</div>
-      <div class="side-username" id="sideUsername" onclick="openEditNameModal('username')">@username ✏️</div>
-      <div class="side-bio" id="sideBio" onclick="openEditBioModal()">Bio ရေးရန်... ✏️</div>
-    </div>
-    
-    <div style="flex: 1;">
-      <div class="menu-item" onclick="openSettingsModal(); toggleSideMenu();" style="padding: 10px 0; cursor:pointer;">⚙️ App Settings</div>
-      <div class="menu-item" onclick="openApiModal(); toggleSideMenu();" style="padding: 10px 0; cursor:pointer;">🔑 AI API Keys</div>
-      <div class="menu-item delete" onclick="logoutGoogle()" style="padding: 10px 0; color:#E41E3F; cursor:pointer;">🚪 Logout အကောင့်ထွက်မည်</div>
-    </div>
-
-    <div class="accounts-list" id="accountsListContainer"></div>
+  <!-- Long Press Action Menu Modal (Pin / Delete) -->
+  <div id="actionMenuOverlay" class="modal-overlay" onclick="closeActionMenu()"></div>
+  <div id="actionMenuModal" class="action-menu-modal">
+    <div class="action-menu-item" id="pinActionBtn" onclick="togglePinChat()">📌 Pin / Unpin Chat</div>
+    <div class="action-menu-item danger" onclick="deleteSelectedChat()">🗑️ Delete Chat</div>
   </div>
 
   <!-- Screen 3: Chat Room -->
@@ -192,37 +229,34 @@
     <div class="chat-header">
       <div class="chat-header-left">
         <button class="back-btn" onclick="goBack()">❮</button>
-        <img src="" id="chatHeaderPic" class="chat-ai-pic" onclick="openAiProfileModal()">
+        <img src="" id="chatHeaderPic" class="chat-ai-pic">
         <span class="chat-header-name" id="chatHeaderName">Name</span>
       </div>
-      <button class="api-settings-btn" id="headerRightBtn" onclick="openApiModal()">🔑 API</button>
     </div>
-    
     <div class="chat-history" id="chatHistoryBox"></div>
-    
     <div class="chat-input-area">
-      <input type="text" id="msgInput" class="chat-input" placeholder="စာရိုက်ပါ..." onkeypress="if(event.key==='Enter') sendMessage()">
+      <input type="text" id="msgInput" class="chat-input" placeholder="Message..." onkeypress="if(event.key==='Enter') sendMessage()">
       <button class="send-btn" onclick="sendMessage()">➤</button>
     </div>
   </div>
 
-  <!-- MODAL: User Profile Preview Modal -->
+  <!-- MODAL: User Profile Preview -->
   <div id="userProfileModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'userProfileModal')">
     <div class="modal-content" style="text-align: center;">
-      <img id="modalProfilePic" src="" style="width:110px; height:110px; border-radius:50%; object-fit:cover; margin-bottom:10px;">
-      <h2 id="modalProfileName" style="margin:5px 0;">Name</h2>
-      <p id="modalProfileUsername" style="color:#0078FF; font-weight:600; margin:0 0 10px 0;">@username</p>
-      <p id="modalProfileBio" style="color:#65676B; font-style:italic; margin:0 0 20px 0; word-break: break-word;">Bio...</p>
+      <img id="modalProfilePic" src="" style="width:100px; height:100px; border-radius:50%; object-fit:cover; margin-bottom:10px;">
+      <h2 id="modalProfileName" style="margin:5px 0; color:#fff;">Name</h2>
+      <p id="modalProfileUsername" style="color:#5288c1; font-weight:600; margin:0 0 10px 0;">@username</p>
+      <p id="modalProfileBio" style="color:#8e9297; font-style:italic; margin:0 0 20px 0; word-break: break-word;">Bio...</p>
       <button class="btn" onclick="startChatWithSelectedUser()">💬 ချက်တင်စတင်မည်</button>
       <button class="btn secondary" onclick="closeModal('userProfileModal')">ပိတ်မည်</button>
     </div>
   </div>
 
-  <!-- MODAL: Edit Bio Modal -->
+  <!-- MODAL: Edit Bio -->
   <div id="editBioModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'editBioModal')">
     <div class="modal-content">
-      <h3 style="margin-top:0; text-align:center;">Bio ရေးရန် / ပြောင်းရန်</h3>
-      <textarea id="bioInput" class="input-control" placeholder="သင့်အကြောင်း အတိုချုံးရေးပါ..." style="height: 90px; resize: none;"></textarea>
+      <h3 style="margin-top:0; color:#fff; text-align:center;">Bio ပြောင်းရန်</h3>
+      <textarea id="bioInput" class="input-control" placeholder="သင့်အကြောင်း..." style="height: 90px; resize: none;"></textarea>
       <button class="btn" onclick="saveBio()">သိမ်းမည်</button>
       <button class="btn secondary" onclick="closeModal('editBioModal')">ပိတ်မည်</button>
     </div>
@@ -231,41 +265,18 @@
   <!-- MODAL: Edit Name / Username -->
   <div id="editNameModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'editNameModal')">
     <div class="modal-content">
-      <h3 id="editModalTitle" style="margin-top:0; text-align:center;">နာမည် ပြောင်းရန်</h3>
+      <h3 id="editModalTitle" style="margin-top:0; color:#fff; text-align:center;">ပြောင်းရန်</h3>
       <input type="text" id="editNameInput" class="input-control" placeholder="အသစ်ထည့်ရန်">
-      <p id="editNameWarning" style="font-size: 12px; color: #E41E3F; margin-top: -5px; margin-bottom: 15px;"></p>
       <button class="btn" onclick="saveUpdatedName()">ပြောင်းမည်</button>
       <button class="btn secondary" onclick="closeModal('editNameModal')">ပိတ်မည်</button>
     </div>
   </div>
 
-  <!-- MODAL: Settings -->
-  <div id="settingsModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'settingsModal')">
-    <div class="modal-content">
-      <h3 style="margin-top:0; text-align:center;">⚙️ App Settings</h3>
-      <div class="theme-switch-box">
-        <span style="font-weight:600;">Dark Theme Mode</span>
-        <input type="checkbox" id="themeToggle" style="width:20px; height:20px; accent-color: #0078FF;" onchange="toggleTheme(this.checked)">
-      </div>
-      <button class="btn secondary" onclick="closeModal('settingsModal')">ပိတ်မည်</button>
-    </div>
-  </div>
-
-  <!-- MODAL: New AI Chat Creation -->
+  <!-- MODAL: New AI Chat -->
   <div id="newChatModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'newChatModal')">
     <div class="modal-content">
-      <h3 style="margin-top:0; text-align:center;">AI Chat အသစ် ဖန်တီးမည်</h3>
-      <input type="file" id="aiPicUpload" accept="image/*" class="hidden" onchange="handleAiPicUpload(event)">
-      <div class="img-upload-box" onclick="document.getElementById('aiPicUpload').click()">
-        <span id="aiPicPlus" style="font-size:30px; color:#888;">+</span>
-        <img id="aiPicPreview" src="" class="hidden">
-      </div>
-      <input type="text" id="newAiName" class="input-control" placeholder="AI နာမည်">
-      <input type="number" id="newAiAge" class="input-control" placeholder="အသက်" value="18">
-      <select id="newAiGender" class="input-control">
-        <option value="female">မ 🙋‍♀️</option>
-        <option value="male">ကျား 🙋‍♂️</option>
-      </select>
+      <h3 style="margin-top:0; color:#fff; text-align:center;">AI Chat အသစ် ဖန်တီးမည်</h3>
+      <input type="text" id="newAiName" class="input-control" placeholder="AI နာမည် (ဥပမာ - Nami)">
       <select id="newAiRelation" class="input-control">
         <option value="friend">သူငယ်ချင်း</option>
         <option value="romantic">ချစ်သူ</option>
@@ -275,24 +286,12 @@
     </div>
   </div>
 
-  <!-- MODAL: AI Profile -->
-  <div id="aiProfileModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'aiProfileModal')">
-    <div class="modal-content" style="text-align: center;">
-      <img id="infoAiPic" src="" style="width:110px; height:110px; border-radius:50%; object-fit:cover; margin-bottom:10px;">
-      <h2 id="infoAiName" style="margin:5px 0;">Name</h2>
-      <p id="infoAiDetails" style="color:#65676B; font-weight:600; margin:0 0 20px 0;"></p>
-      <input type="file" id="chatBgUpload" accept="image/*" class="hidden" onchange="handleChatBgUpload(event)">
-      <button class="btn secondary" style="margin-bottom:10px;" onclick="document.getElementById('chatBgUpload').click()">🖼️ နောက်ခံပုံ ပြောင်းမည်</button>
-      <button class="btn" style="background:#E41E3F;" onclick="deleteCurrentChat()">Delete Chat</button>
-      <button class="btn secondary" onclick="closeModal('aiProfileModal')">ပိတ်မည်</button>
-    </div>
-  </div>
-
   <!-- MODAL: API Keys -->
   <div id="apiModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'apiModal')">
     <div class="modal-content">
-      <h3 style="margin-top:0; text-align:center;">🔑 AI API Keys</h3>
-      <div class="api-keys-grid" id="apiKeysContainer"></div>
+      <h3 style="margin-top:0; color:#fff; text-align:center;">🔑 AI API Keys (Max 10)</h3>
+      <div id="apiKeysContainer" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; margin-bottom:12px;"></div>
+      <button class="btn" onclick="addApiKeyInput()">+ ထပ်ထည့်ရန်</button>
       <button class="btn" onclick="saveApiKeys()">Save Keys</button>
       <button class="btn secondary" onclick="closeModal('apiModal')">ပိတ်မည်</button>
     </div>
@@ -300,7 +299,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithRedirect, getRedirectResult, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, doc, setDoc, getDocs, addDoc, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -318,21 +317,10 @@
     const db = getFirestore(app);
     const provider = new GoogleAuthProvider();
 
-    // Check Redirect Result when page loads back from Google
-    getRedirectResult(auth)
-      .then((result) => {
-        if (result && result.user) {
-          const user = result.user;
-          window.firebaseUserUid = user.uid;
-          handleGoogleLoginSuccess(user);
-        }
-      }).catch((error) => {
-        console.error("Redirect login error:", error);
-      });
-
     window.loginWithGoogle = function() {
-      // Using redirect to seamlessly work across mobile browsers and GitHub Pages
-      signInWithRedirect(auth, provider);
+      signInWithPopup(auth, provider).then((res) => {
+        handleGoogleLoginSuccess(res.user);
+      }).catch(err => alert("Login Error: " + err.message));
     };
 
     window.logoutGoogle = function() {
@@ -344,27 +332,22 @@
 
     window.syncUserProfileToCloud = async function(uid, name, username, pic, bio) {
       try {
-        await setDoc(doc(db, "users", uid), {
-          uid: uid, name: name, username: username,
-          pic: pic || '', bio: bio || ''
-        }, { merge: true });
-      } catch(e) { console.error("Cloud sync error:", e); }
+        await setDoc(doc(db, "users", uid), { uid, name, username, pic: pic || '', bio: bio || '' }, { merge: true });
+      } catch(e) {}
     };
 
     window.searchCloudUsers = async function(keyword, callback) {
       try {
-        const querySnapshot = await getDocs(collection(db, "users"));
-        let results = [];
-        querySnapshot.forEach((docSnap) => {
-          let u = docSnap.data();
+        const snap = await getDocs(collection(db, "users"));
+        let res = [];
+        snap.forEach(d => {
+          let u = d.data();
           if (u.uid !== (window.firebaseUserUid || currentUid)) {
             let kw = keyword.toLowerCase();
-            if ((u.name && u.name.toLowerCase().includes(kw)) || (u.username && u.username.toLowerCase().includes(kw))) {
-              results.push(u);
-            }
+            if ((u.name && u.name.toLowerCase().includes(kw)) || (u.username && u.username.toLowerCase().includes(kw))) res.push(u);
           }
         });
-        callback(results);
+        callback(res);
       } catch(e) { callback([]); }
     };
 
@@ -374,7 +357,7 @@
       const q = query(collection(db, "p2p_chats", roomId, "messages"), orderBy("timestamp", "asc"));
       unsubscribeP2P = onSnapshot(q, (snapshot) => {
         let msgs = [];
-        snapshot.forEach((doc) => { msgs.push(doc.data()); });
+        snapshot.forEach(doc => msgs.push(doc.data()));
         callback(msgs);
       });
     };
@@ -386,7 +369,7 @@
           content: text,
           timestamp: serverTimestamp()
         });
-      } catch(e) { console.error("P2P send error:", e); }
+      } catch(e) {}
     };
   </script>
 
@@ -396,69 +379,57 @@
 
     let appState = {
       myUserName: 'Real human', myUsernameHandle: '@user',
-      myBio: 'Hey there! I am using AI Messenger.', myProfilePic: null,
-      theme: localStorage.getItem('theme') || 'light',
-      apiKeys: [], chats: [], currentChatId: null,
-      lastUsernameChange: 0, lastNameChange: 0
+      myBio: 'Hey there! I am using Telegram Messenger.', myProfilePic: null,
+      apiKeys: [], chats: [], currentChatId: null
     };
 
-    let currentMainTab = 'ai';
     let selectedSearchedUser = null;
-    let tempAiPicBase64 = null;
-    let activeModal = null;
+    let longPressedChatId = null;
     let editingFieldType = null;
-    const defaultAiPic = "https://ui-avatars.com/api/?name=AI&background=0078FF&color=fff";
+    const defaultPic = "https://ui-avatars.com/api/?name=User&background=5288c1&color=fff";
 
-    window.handleGoogleLoginSuccess = function(user) {
+    function handleGoogleLoginSuccess(user) {
       window.firebaseUserUid = user.uid;
-      let existingAcc = accounts.find(acc => acc.uid === user.uid);
-      if (!existingAcc) {
-        if (accounts.length >= 3) {
-          alert("အကောင့်အများဆုံး ၃ ခုသာ ထည့်သွင်းသုံးစွဲနိုင်ပါသည်။");
-          return;
-        }
-        existingAcc = {
+      let acc = accounts.find(a => a.uid === user.uid);
+      if (!acc) {
+        if (accounts.length >= 3) return alert("အကောင့်အများဆုံး ၃ ခုသာ ထည့်နိုင်ပါသည်။");
+        acc = {
           uid: user.uid, name: user.displayName || 'User',
           username: '@' + user.email.split('@')[0],
-          bio: 'Hey there! I am using AI Messenger.',
-          pic: user.photoURL || 'https://ui-avatars.com/api/?name=' + user.displayName,
-          chats: [], apiKeys: [], lastUsernameChange: 0, lastNameChange: 0
+          bio: 'Hey there!', pic: user.photoURL || defaultPic,
+          chats: [], apiKeys: []
         };
-        accounts.push(existingAcc);
+        accounts.push(acc);
       }
       saveAccounts();
       switchAccount(user.uid);
       document.getElementById('loginScreen').classList.add('hidden');
       document.getElementById('mainScreen').classList.remove('hidden');
-      renderChatLists(); updateSideMenuUI(); renderAccountSwitcher();
+      renderChatLists(); updateProfileUI();
     }
 
     function switchAccount(uid) {
       currentUid = uid; window.firebaseUserUid = uid;
       localStorage.setItem('currentAccountUid', uid);
       let acc = accounts.find(a => a.uid === uid);
-      if(acc) {
+      if (acc) {
         appState.myUserName = acc.name;
         appState.myUsernameHandle = acc.username || '@user';
         appState.myBio = acc.bio || '';
         appState.myProfilePic = acc.pic;
         appState.chats = acc.chats || [];
         appState.apiKeys = acc.apiKeys || [];
-        appState.lastUsernameChange = acc.lastUsernameChange || 0;
-        appState.lastNameChange = acc.lastNameChange || 0;
         window.syncUserProfileToCloud(uid, appState.myUserName, appState.myUsernameHandle, appState.myProfilePic, appState.myBio);
       }
-      renderChatLists(); updateSideMenuUI(); renderAccountSwitcher();
+      renderChatLists(); updateProfileUI();
     }
 
     function saveCurrentAccountData() {
       let acc = accounts.find(a => a.uid === currentUid);
-      if(acc) {
+      if (acc) {
         acc.name = appState.myUserName; acc.username = appState.myUsernameHandle;
         acc.bio = appState.myBio; acc.pic = appState.myProfilePic;
         acc.chats = appState.chats; acc.apiKeys = appState.apiKeys;
-        acc.lastUsernameChange = appState.lastUsernameChange;
-        acc.lastNameChange = appState.lastNameChange;
         saveAccounts();
         window.syncUserProfileToCloud(currentUid, appState.myUserName, appState.myUsernameHandle, appState.myProfilePic, appState.myBio);
       }
@@ -466,112 +437,89 @@
 
     function saveAccounts() { localStorage.setItem('ai_messenger_accounts', JSON.stringify(accounts)); }
 
-    function renderAccountSwitcher() {
-      const container = document.getElementById('accountsListContainer');
-      container.innerHTML = '';
-      accounts.forEach(acc => {
-        let img = document.createElement('img');
-        img.src = acc.pic || defaultAiPic;
-        img.className = `account-avatar ${acc.uid === currentUid ? 'active' : ''}`;
-        img.onclick = () => { saveCurrentAccountData(); switchAccount(acc.uid); };
-        container.appendChild(img);
-      });
-      if(accounts.length < 3) {
-        let addBtn = document.createElement('div');
-        addBtn.className = 'add-account-btn'; addBtn.innerText = '+';
-        addBtn.onclick = () => { saveCurrentAccountData(); loginWithGoogle(); };
-        container.appendChild(addBtn);
-      }
-    }
-
     window.onload = () => {
-      if(currentUid && accounts.some(a => a.uid === currentUid)) {
+      if (currentUid && accounts.some(a => a.uid === currentUid)) {
         switchAccount(currentUid);
         document.getElementById('loginScreen').classList.add('hidden');
         document.getElementById('mainScreen').classList.remove('hidden');
-        renderChatLists(); updateSideMenuUI(); renderAccountSwitcher();
+        renderChatLists(); updateProfileUI();
       } else {
         document.getElementById('loginScreen').classList.remove('hidden');
       }
     };
 
-    function toggleSideMenu() {
-      document.getElementById('sideMenu').classList.toggle('active');
-      document.getElementById('sideMenuOverlay').classList.toggle('active');
+    function updateProfileUI() {
+      document.getElementById('profileScreenName').innerText = appState.myUserName;
+      document.getElementById('profileScreenUsername').innerText = appState.myUsernameHandle + ' ✏️';
+      document.getElementById('profileScreenBio').innerText = (appState.myBio || 'Bio ရေးရန်...') + ' ✏️';
+      let pic = appState.myProfilePic || defaultPic;
+      document.getElementById('profileScreenPic').src = pic;
+      document.getElementById('bottomNavProfilePic').src = pic;
     }
 
-    function updateSideMenuUI() {
-      document.getElementById('sideDisplayName').innerText = appState.myUserName + ' ✏️';
-      document.getElementById('sideUsername').innerText = appState.myUsernameHandle + ' ✏️';
-      document.getElementById('sideBio').innerText = (appState.myBio || 'Bio ရေးရန်...') + ' ✏️';
-      if(appState.myProfilePic) document.getElementById('sideProfilePic').src = appState.myProfilePic;
-    }
-
+    // 4-Tab Switching
     function switchMainTab(tab) {
-      currentMainTab = tab;
-      document.getElementById('tabAiBtn').classList.remove('active');
-      document.getElementById('tabP2pBtn').classList.remove('active');
-      document.getElementById('aiTabContainer').classList.add('hidden');
-      document.getElementById('p2pTabContainer').classList.add('hidden');
+      ['chats', 'contacts', 'settings', 'profile'].forEach(t => {
+        document.getElementById(`${t}TabContainer`).classList.add('hidden');
+        document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}Btn`).classList.remove('active');
+      });
+      document.getElementById(`${tab}TabContainer`).classList.remove('hidden');
+      document.getElementById(`tab${tab.charAt(0).toUpperCase() + tab.slice(1)}Btn`).classList.add('active');
 
-      if (tab === 'ai') {
-        document.getElementById('tabAiBtn').classList.add('active');
-        document.getElementById('aiTabContainer').classList.remove('hidden');
-        document.getElementById('headerTitle').innerText = 'AI Chats';
-        document.getElementById('searchUsersBtn').classList.add('hidden');
-        document.getElementById('headerAddBtn').setAttribute('onclick', 'openNewChatModal()');
-        document.getElementById('headerAddBtn').innerText = '📝';
-      } else {
-        document.getElementById('tabP2pBtn').classList.add('active');
-        document.getElementById('p2pTabContainer').classList.remove('hidden');
-        document.getElementById('headerTitle').innerText = 'လူအချင်းချင်း ချက်တင်';
+      if (tab === 'chats') {
+        document.getElementById('headerTitle').innerText = 'Chats';
         document.getElementById('searchUsersBtn').classList.remove('hidden');
-        document.getElementById('headerAddBtn').setAttribute('onclick', 'openSearchScreen()');
-        document.getElementById('headerAddBtn').innerText = '🔍';
+        document.getElementById('headerAddBtn').classList.remove('hidden');
+      } else if (tab === 'contacts') {
+        document.getElementById('headerTitle').innerText = 'Contacts';
+        document.getElementById('searchUsersBtn').classList.add('hidden');
+        document.getElementById('headerAddBtn').classList.add('hidden');
+        loadContacts('');
+      } else if (tab === 'settings') {
+        document.getElementById('headerTitle').innerText = 'Settings';
+        document.getElementById('searchUsersBtn').classList.add('hidden');
+        document.getElementById('headerAddBtn').classList.add('hidden');
+      } else if (tab === 'profile') {
+        document.getElementById('headerTitle').innerText = 'Profile';
+        document.getElementById('searchUsersBtn').classList.add('hidden');
+        document.getElementById('headerAddBtn').classList.add('hidden');
       }
-      renderChatLists();
     }
 
-    function openSearchScreen() {
-      document.getElementById('searchScreen').classList.add('active');
-      document.getElementById('userSearchInput').value = '';
-      document.getElementById('searchResultsContainer').innerHTML = '<p style="text-align:center; color:#65676B; margin-top:20px;">ရှာဖွေရန် နာမည် သို့မဟုတ် @username ထည့်ပါ</p>';
-    }
+    function openSearchScreen() { document.getElementById('searchScreen').classList.add('active'); }
     function closeSearchScreen() { document.getElementById('searchScreen').classList.remove('active'); }
 
     function searchUsers(keyword) {
-      keyword = keyword.trim();
       const container = document.getElementById('searchResultsContainer');
-      if (!keyword) {
-        container.innerHTML = '<p style="text-align:center; color:#65676B; margin-top:20px;">ရှာဖွေရန် နာမည် သို့မဟုတ် @username ထည့်ပါ</p>';
-        return;
-      }
-      container.innerHTML = '<p style="text-align:center; color:#65676B; margin-top:20px;">ရှာနေပါသည်...</p>';
-      window.searchCloudUsers(keyword, (users) => {
+      if (!keyword.trim()) { container.innerHTML = ''; return; }
+      window.searchCloudUsers(keyword, users => {
         container.innerHTML = '';
-        if (users.length === 0) {
-          container.innerHTML = '<p style="text-align:center; color:#65676B; margin-top:20px;">မတွေ့ရှိပါ။</p>';
-          return;
-        }
         users.forEach(u => {
-          let div = document.createElement('div');
-          div.className = 'chat-item';
+          let div = document.createElement('div'); div.className = 'chat-item';
           div.onclick = () => showUserProfileModal(u);
-          div.innerHTML = `
-            <img src="${u.pic || defaultAiPic}" class="chat-item-pic">
-            <div class="chat-item-info">
-              <div class="chat-item-name">${u.name}</div>
-              <div class="chat-item-lastmsg">${u.username} • ${u.bio || ''}</div>
-            </div>
-          `;
+          div.innerHTML = `<img src="${u.pic || defaultPic}" class="chat-item-pic"><div class="chat-item-info"><div class="chat-item-name">${u.name}</div><div class="chat-item-lastmsg">${u.username}</div></div>`;
           container.appendChild(div);
         });
       });
     }
 
+    function loadContacts(keyword) {
+      const container = document.getElementById('contactsListResults');
+      window.searchCloudUsers(keyword, users => {
+        container.innerHTML = '';
+        users.forEach(u => {
+          let div = document.createElement('div'); div.className = 'chat-item';
+          div.onclick = () => showUserProfileModal(u);
+          div.innerHTML = `<img src="${u.pic || defaultPic}" class="chat-item-pic"><div class="chat-item-info"><div class="chat-item-name">${u.name}</div><div class="chat-item-lastmsg">${u.username} • online</div></div>`;
+          container.appendChild(div);
+        });
+      });
+    }
+    function searchContacts(kw) { loadContacts(kw); }
+
     function showUserProfileModal(userObj) {
       selectedSearchedUser = userObj;
-      document.getElementById('modalProfilePic').src = userObj.pic || defaultAiPic;
+      document.getElementById('modalProfilePic').src = userObj.pic || defaultPic;
       document.getElementById('modalProfileName').innerText = userObj.name;
       document.getElementById('modalProfileUsername').innerText = userObj.username;
       document.getElementById('modalProfileBio').innerText = userObj.bio || 'Bio မရှိသေးပါ။';
@@ -583,233 +531,181 @@
       closeModal('userProfileModal'); closeSearchScreen();
       let friendId = selectedSearchedUser.uid;
       let roomId = [currentUid, friendId].sort().join('_');
-      let existingChat = appState.chats.find(c => c.id === roomId);
-
-      if (!existingChat) {
-        let newP2PChat = {
-          id: roomId, type: 'p2p', friendId: friendId,
-          name: selectedSearchedUser.name, username: selectedSearchedUser.username,
-          pic: selectedSearchedUser.pic || defaultAiPic,
-          messages: [], lastUpdated: Date.now(), unreadCount: 0
-        };
-        appState.chats.unshift(newP2PChat);
+      if (!appState.chats.some(c => c.id === roomId)) {
+        appState.chats.unshift({
+          id: roomId, type: 'p2p', friendId, name: selectedSearchedUser.name,
+          pic: selectedSearchedUser.pic || defaultPic, messages: [], lastUpdated: Date.now(), pinned: false
+        });
         saveCurrentAccountData();
       }
-      switchMainTab('p2p'); openChatRoom(roomId);
+      switchMainTab('chats'); openChatRoom(roomId);
     }
 
-    function openEditBioModal() {
-      document.getElementById('bioInput').value = appState.myBio || '';
-      openModal('editBioModal');
+    // Long Press for Pin / Delete Chat
+    let pressTimer;
+    function handleChatTouchStart(chatId) {
+      longPressedChatId = chatId;
+      pressTimer = setTimeout(() => {
+        document.getElementById('actionMenuOverlay').classList.add('active');
+        document.getElementById('actionMenuModal').classList.add('active');
+      }, 600); // 0.6 second long press
     }
-    function saveBio() {
-      appState.myBio = document.getElementById('bioInput').value.trim();
-      saveCurrentAccountData(); updateSideMenuUI(); closeModal('editBioModal');
+    function handleChatTouchEnd() { clearTimeout(pressTimer); }
+    function closeActionMenu() {
+      document.getElementById('actionMenuOverlay').classList.remove('active');
+      document.getElementById('actionMenuModal').classList.remove('active');
     }
 
-    function openEditNameModal(fieldType) {
-      editingFieldType = fieldType;
-      if (fieldType === 'username') {
-        document.getElementById('editModalTitle').innerText = "Username ပြောင်းရန်";
-        document.getElementById('editNameInput').value = appState.myUsernameHandle;
-      } else {
-        document.getElementById('editModalTitle').innerText = "နာမည် ပြောင်းရန်";
-        document.getElementById('editNameInput').value = appState.myUserName;
+    function togglePinChat() {
+      let chat = appState.chats.find(c => c.id === longPressedChatId);
+      if (chat) { chat.pinned = !chat.pinned; saveCurrentAccountData(); renderChatLists(); }
+      closeActionMenu();
+    }
+
+    function deleteSelectedChat() {
+      if (confirm("ဒီ chat ကို ဖျက်မှာ သေချာပြီလား?")) {
+        appState.chats = appState.chats.filter(c => c.id !== longPressedChatId);
+        saveCurrentAccountData(); renderChatLists();
       }
-      document.getElementById('editNameWarning').innerText = "";
+      closeActionMenu();
+    }
+
+    function renderChatLists() {
+      appState.chats.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || b.lastUpdated - a.lastUpdated);
+      const container = document.getElementById('chatsTabContainer');
+      container.innerHTML = '';
+      if (appState.chats.length === 0) {
+        container.innerHTML = '<p style="text-align:center; color:#8e9297; margin-top:40px;">စကားပြောခန်းများ မရှိသေးပါ။</p>';
+        return;
+      }
+      appState.chats.forEach(chat => {
+        let lastMsg = chat.messages.length > 0 ? chat.messages[chat.messages.length - 1].content : 'စကားစပြောပါ...';
+        let div = document.createElement('div'); div.className = 'chat-item';
+        div.onmousedown = () => handleChatTouchStart(chat.id);
+        div.onmouseup = handleChatTouchEnd;
+        div.onttouchstart = () => handleChatTouchStart(chat.id);
+        div.ontouchend = handleChatTouchEnd;
+        div.onclick = () => { chat.unreadCount = 0; saveCurrentAccountData(); openChatRoom(chat.id); };
+        div.innerHTML = `
+          <img src="${chat.pic || defaultPic}" class="chat-item-pic">
+          <div class="chat-item-info">
+            <div class="chat-item-name">${chat.name} ${chat.type==='p2p'?'🟢':''}</div>
+            <div class="chat-item-lastmsg">${lastMsg}</div>
+          </div>
+          ${chat.pinned ? '<span class="pinned-icon">📌 Pin</span>' : ''}
+          ${chat.unreadCount ? `<div class="unread-badge">${chat.unreadCount}</div>` : ''}
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function openChatRoom(chatId) {
+      appState.currentChatId = chatId;
+      let chat = appState.chats.find(c => c.id === chatId);
+      document.getElementById('chatHeaderName').innerText = chat.name;
+      document.getElementById('chatHeaderPic').src = chat.pic || defaultPic;
+      if (chat.type === 'p2p') {
+        window.subP2PMessages(chat.id, msgs => {
+          chat.messages = msgs.map(m => ({ role: m.senderId === currentUid ? 'user' : 'model', content: m.content }));
+          renderChatHistory(chat);
+        });
+      } else {
+        renderChatHistory(chat);
+      }
+      document.getElementById('chatRoomScreen').classList.add('active');
+    }
+
+    function renderChatHistory(chat) {
+      const box = document.getElementById('chatHistoryBox');
+      box.innerHTML = '';
+      chat.messages.forEach(m => {
+        let d = document.createElement('div');
+        d.className = `msg-bubble ${m.role === 'user' ? 'msg-user' : 'msg-bot'}`;
+        d.innerHTML = m.content.replace(/\n/g, '<br>');
+        box.appendChild(d);
+      });
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function goBack() { document.getElementById('chatRoomScreen').classList.remove('active'); renderChatLists(); }
+
+    async function sendMessage() {
+      const input = document.getElementById('msgInput'); const text = input.value.trim(); if (!text) return;
+      let chat = appState.chats.find(c => c.id === appState.currentChatId);
+      input.value = '';
+      if (chat.type === 'p2p') {
+        window.sendP2PMessageToFirestore(chat.id, text);
+      } else {
+        chat.messages.push({ role: 'user', content: text });
+        chat.lastUpdated = Date.now(); saveCurrentAccountData();
+        renderChatHistory(chat);
+      }
+    }
+
+    // Modal Helpers
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+    function closeModalOnOutsideClick(e, id) { if (e.target.id === id) closeModal(id); }
+
+    function openNewChatModal() { document.getElementById('newAiName').value = ''; openModal('newChatModal'); }
+    function createNewChat() {
+      const name = document.getElementById('newAiName').value.trim(); if (!name) return;
+      appState.chats.unshift({
+        id: Date.now().toString(), type: 'ai', name,
+        pic: "https://ui-avatars.com/api/?name=" + name + "&background=5288c1&color=fff",
+        messages: [{ role: 'model', content: `ဟိုင်း 👋 ${appState.myUserName}၊ စကားပြောလို့ရပါပြီနော်။` }],
+        lastUpdated: Date.now(), pinned: false
+      });
+      saveCurrentAccountData(); closeModal('newChatModal'); renderChatLists();
+    }
+
+    function openEditBioModal() { document.getElementById('bioInput').value = appState.myBio; openModal('editBioModal'); }
+    function saveBio() { appState.myBio = document.getElementById('bioInput').value.trim(); saveCurrentAccountData(); updateProfileUI(); closeModal('editBioModal'); }
+
+    function openEditNameModal(type) {
+      editingFieldType = type;
+      document.getElementById('editModalTitle').innerText = type === 'username' ? 'Username ပြောင်းရန်' : 'နာမည် ပြောင်းရန်';
+      document.getElementById('editNameInput').value = type === 'username' ? appState.myUsernameHandle : appState.myUserName;
       openModal('editNameModal');
     }
-
     function saveUpdatedName() {
-      const val = document.getElementById('editNameInput').value.trim();
-      if(!val) return;
-      if (editingFieldType === 'username') {
-        appState.myUsernameHandle = val.startsWith('@') ? val : '@' + val;
-      } else {
-        appState.myUserName = val;
-      }
-      saveCurrentAccountData(); updateSideMenuUI(); closeModal('editNameModal');
+      const val = document.getElementById('editNameInput').value.trim(); if (!val) return;
+      if (editingFieldType === 'username') appState.myUsernameHandle = val.startsWith('@') ? val : '@' + val;
+      else appState.myUserName = val;
+      saveCurrentAccountData(); updateProfileUI(); closeModal('editNameModal');
     }
 
     function handleMyProfileUpload(e) {
       const file = e.target.files[0]; if (!file) return;
       const reader = new FileReader();
-      reader.onload = (ev) => {
-        appState.myProfilePic = ev.target.result;
-        saveCurrentAccountData(); updateSideMenuUI(); renderAccountSwitcher();
-      };
+      reader.onload = ev => { appState.myProfilePic = ev.target.result; saveCurrentAccountData(); updateProfileUI(); };
       reader.readAsDataURL(file);
     }
 
-    function openModal(modalId) { document.getElementById(modalId).classList.add('active'); activeModal = modalId; }
-    function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); activeModal = null; }
-    function closeModalOnOutsideClick(e, modalId) { if (e.target.id === modalId) closeModal(modalId); }
-    function openSettingsModal() { openModal('settingsModal'); }
-    function openApiModal() { openModal('apiModal'); }
-
-    function toggleTheme(isDark) {
-      if(isDark) { document.body.classList.add('dark-theme'); appState.theme = 'dark'; } 
-      else { document.body.classList.remove('dark-theme'); appState.theme = 'light'; }
-      localStorage.setItem('theme', appState.theme);
-    }
-
-    function openNewChatModal() {
-      tempAiPicBase64 = null; document.getElementById('aiPicPreview').src = "";
-      document.getElementById('aiPicPreview').classList.add('hidden'); document.getElementById('aiPicPlus').classList.remove('hidden');
-      document.getElementById('newAiName').value = ""; openModal('newChatModal');
-    }
-    function handleAiPicUpload(e) {
-      const file = e.target.files[0]; if (!file) return;
-      const reader = new FileReader();
-      reader.onload = (ev) => { tempAiPicBase64 = ev.target.result; document.getElementById('aiPicPreview').src = tempAiPicBase64; document.getElementById('aiPicPreview').classList.remove('hidden'); document.getElementById('aiPicPlus').classList.add('hidden'); }; 
-      reader.readAsDataURL(file);
-    }
-    function createNewChat() {
-      const name = document.getElementById('newAiName').value.trim();
-      if (!name) return alert("AI နာမည် ထည့်ပါ။");
-      const newChat = {
-        id: Date.now().toString(), type: 'ai', name: name,
-        age: document.getElementById('newAiAge').value || '18',
-        gender: document.getElementById('newAiGender').value,
-        relation: document.getElementById('newAiRelation').value,
-        pic: tempAiPicBase64, messages: [{ role: 'model', content: `ဟိုင်း 👋 ${appState.myUserName}၊ အခုကစပြီး စကားပြောလို့ရပါပြီနော်။` }],
-        lastUpdated: Date.now(), unreadCount: 1
-      };
-      appState.chats.unshift(newChat); saveCurrentAccountData(); closeModal('newChatModal'); renderChatLists(); openChatRoom(newChat.id);
-    }
-
-    function renderChatLists() {
-      appState.chats.sort((a,b) => b.lastUpdated - a.lastUpdated);
-      
-      const aiContainer = document.getElementById('aiTabContainer');
-      aiContainer.innerHTML = '';
-      appState.chats.filter(c => c.type !== 'p2p').forEach(chat => {
-        const lastMsg = chat.messages.length > 0 ? chat.messages[chat.messages.length-1].content.substring(0, 30) : '';
-        const unread = chat.unreadCount && chat.unreadCount > 0;
-        const div = document.createElement('div'); 
-        div.className = `chat-item`; 
-        div.onclick = () => { chat.unreadCount = 0; saveCurrentAccountData(); openChatRoom(chat.id); };
-        div.innerHTML = `
-          <img src="${chat.pic || defaultAiPic}" class="chat-item-pic">
-          <div class="chat-item-info">
-            <div class="chat-item-name">${chat.name}</div>
-            <div class="chat-item-lastmsg">${lastMsg}</div>
-          </div>
-          ${unread ? `<div class="unread-badge">${chat.unreadCount}</div>` : ''}
-        `;
-        aiContainer.appendChild(div);
+    function openApiModal() {
+      const container = document.getElementById('apiKeysContainer');
+      container.innerHTML = '';
+      appState.apiKeys.forEach((k, idx) => {
+        let inp = document.createElement('input'); inp.type = 'text'; inp.className = 'input-control'; inp.value = k.key; inp.id = `apiKey_${idx}`;
+        container.appendChild(inp);
       });
-
-      const p2pContainer = document.getElementById('p2pTabContainer');
-      p2pContainer.innerHTML = '';
-      let p2pChats = appState.chats.filter(c => c.type === 'p2p');
-      if (p2pChats.length === 0) {
-        p2pContainer.innerHTML = '<p style="text-align:center; color:#65676B; margin-top:40px;">ချက်တင်လုပ်ထားသော သူငယ်ချင်းများ မရှိသေးပါ။<br>အပေါ်ထောင့်က 🔍 ကိုနှိပ်၍ User ရှာပါ။</p>';
-      } else {
-        p2pChats.forEach(chat => {
-          const lastMsg = chat.messages.length > 0 ? chat.messages[chat.messages.length-1].content.substring(0, 30) : 'စကားစပြောပါ...';
-          const unread = chat.unreadCount && chat.unreadCount > 0;
-          const div = document.createElement('div'); 
-          div.className = `chat-item`; 
-          div.onclick = () => { chat.unreadCount = 0; saveCurrentAccountData(); openChatRoom(chat.id); };
-          div.innerHTML = `
-            <img src="${chat.pic || defaultAiPic}" class="chat-item-pic">
-            <div class="chat-item-info">
-              <div class="chat-item-name">${chat.name} 🟢</div>
-              <div class="chat-item-lastmsg">${lastMsg}</div>
-            </div>
-            ${unread ? `<div class="unread-badge">${chat.unreadCount}</div>` : ''}
-          `;
-          p2pContainer.appendChild(div);
-        });
-      }
+      if (appState.apiKeys.length === 0) addApiKeyInput();
+      openModal('apiModal');
     }
-
-    function openChatRoom(chatId) {
-      appState.currentChatId = chatId; const chat = appState.chats.find(c => c.id === chatId);
-      chat.unreadCount = 0; saveCurrentAccountData();
-      document.getElementById('chatHeaderName').innerText = chat.name; 
-      document.getElementById('chatHeaderPic').src = chat.pic || defaultAiPic;
-      
-      const historyBox = document.getElementById('chatHistoryBox');
-      historyBox.style.backgroundImage = chat.bg ? `url(${chat.bg})` : 'none';
-
-      if (chat.type === 'p2p') {
-        document.getElementById('headerRightBtn').style.display = 'none';
-        window.subP2PMessages(chat.id, (firestoreMsgs) => {
-          chat.messages = firestoreMsgs.map(m => ({
-            role: m.senderId === currentUid ? 'user' : 'model',
-            content: m.content
-          }));
-          renderChatHistory(chat, true);
-        });
-      } else {
-        document.getElementById('headerRightBtn').style.display = 'block';
-        renderChatHistory(chat);
-      }
-      document.getElementById('chatRoomScreen').classList.add('active');
+    function addApiKeyInput() {
+      const container = document.getElementById('apiKeysContainer');
+      let idx = container.children.length;
+      if (idx >= 10) return;
+      let inp = document.createElement('input'); inp.type = 'text'; inp.className = 'input-control'; inp.placeholder = 'API Key ထည့်ပါ'; inp.id = `apiKey_${idx}`;
+      container.appendChild(inp);
     }
-    
-    function closeChatRoom() {
-      document.getElementById('chatRoomScreen').classList.remove('active'); appState.currentChatId = null; renderChatLists();
-    }
-    function goBack() { closeChatRoom(); }
-
-    function renderChatHistory(chat, preserveScroll = false) {
-      const box = document.getElementById('chatHistoryBox'); 
-      const currentScroll = box.scrollTop; box.innerHTML = ''; 
-      chat.messages.forEach((m, index) => appendMsgUI(m));
-      if (preserveScroll) box.scrollTop = currentScroll; else box.scrollTop = box.scrollHeight;
-    }
-
-    function appendMsgUI(m, autoScroll = true) {
-      const box = document.getElementById('chatHistoryBox');
-      const rowDiv = document.createElement('div'); rowDiv.className = `msg-row`;
-      const bubbleDiv = document.createElement('div'); 
-      bubbleDiv.className = `msg-bubble ${m.role === 'user' ? 'msg-user' : 'msg-bot'}`;
-      bubbleDiv.innerHTML = m.content.replace(/\n/g, '<br>');
-      rowDiv.appendChild(bubbleDiv); box.appendChild(rowDiv); 
-      if (autoScroll) box.scrollTop = box.scrollHeight;
-    }
-
-    function openAiProfileModal() {
-      const chat = appState.chats.find(c => c.id === appState.currentChatId);
-      if(chat.type === 'p2p') return;
-      document.getElementById('infoAiPic').src = chat.pic || defaultAiPic;
-      document.getElementById('infoAiName').innerText = chat.name;
-      document.getElementById('infoAiDetails').innerText = `${chat.age} yrs • ${chat.gender} • ${chat.relation}`;
-      openModal('aiProfileModal');
-    }
-    function deleteCurrentChat() {
-      if(confirm("ဒီစကားပြောခန်းကို ဖျက်မှာ သေချာပြီလား?")) {
-        appState.chats = appState.chats.filter(c => c.id !== appState.currentChatId);
-        saveCurrentAccountData(); closeModal('aiProfileModal'); closeChatRoom();
-      }
-    }
-
     function saveApiKeys() {
       let keys = [];
-      for(let i=0; i<10; i++) {
-        let val = document.getElementById(`apiKey_${i}`)?.value.trim();
-        if (val) keys.push({ key: val });
+      for (let i = 0; i < 10; i++) {
+        let el = document.getElementById(`apiKey_${i}`);
+        if (el && el.value.trim()) keys.push({ key: el.value.trim() });
       }
-      appState.apiKeys = keys; saveCurrentAccountData();
-      closeModal('apiModal'); alert("API Keys သိမ်းဆည်းပြီးပါပြီ။");
-    }
-
-    async function sendMessage() {
-      const input = document.getElementById('msgInput'); const text = input.value.trim(); if (!text) return;
-      let chat = appState.chats.find(c => c.id === appState.currentChatId);
-      
-      if (chat.type === 'p2p') {
-        input.value = '';
-        window.sendP2PMessageToFirestore(chat.id, text);
-        return;
-      }
-
-      chat.messages.push({ role: 'user', content: text }); chat.lastUpdated = Date.now(); saveCurrentAccountData();
-      appendMsgUI(chat.messages[chat.messages.length - 1], true); 
-      input.value = '';
+      appState.apiKeys = keys; saveCurrentAccountData(); closeModal('apiModal'); alert("API Keys သိမ်းပြီးပါပြီ။");
     }
   </script>
 </body>
