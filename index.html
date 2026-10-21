@@ -1,74 +1,315 @@
 <!DOCTYPE html>
 <html lang="my">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark Mode Application UI</title>
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Custom External CSS File -->
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Telegram Style AI & P2P Messenger Ultimate</title>
+  <!-- Custom External CSS -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Main Container -->
-    <div class="app-container">
-        
-        <!-- Header Section -->
-        <header class="app-header">
-            <div class="brand">
-                <i class="fa-solid fa-cube logo-icon"></i>
-                <h2>Dashboard</h2>
-            </div>
-            <button class="icon-btn" id="theme-toggle" aria-label="Toggle Theme">
-                <i class="fa-solid fa-moon"></i>
-            </button>
-        </header>
+  <!-- Screen 0: Google Login / Key Bypass -->
+  <div id="loginScreen" class="screen">
+    <div style="font-size: 70px; margin-bottom: 15px;">🌐</div>
+    <h2 style="margin-top:0; color:#fff;">Telegram AI & P2P Messenger</h2>
+    <p style="color: #8e9297; font-size: 14px; margin-bottom: 20px; padding: 0 20px;">
+      Google ဖြင့် ဝင်ပါ (သို့) အကောင့်မလိုဘဲ Key ရိုက်ထည့်၍ ဝင်ရောက်ပါ။
+    </p>
+    <div style="width: 80%; max-width: 300px; margin: 0 auto 15px auto;">
+      <input type="text" id="bypassKeyInput" class="input-control" placeholder="Key ရိုက်ထည့်ပါ..." style="text-align: center;">
+      <button class="btn secondary" onclick="loginWithBypassKey()" style="margin-top:5px;">🔑 Key ဖြင့် ဝင်မည်</button>
+    </div>
+    <button class="btn" onclick="loginWithGoogle()" style="background: #4285F4; color: white; width: 80%; max-width: 300px; margin: 0 auto; display: flex; justify-content: center; align-items: center; gap: 10px;">
+      🌐 Google ဖြင့် ဝင်မည်
+    </button>
+  </div>
 
-        <!-- Main Content Area -->
-        <main class="app-main">
-            <!-- Sidebar / Control Panel -->
-            <aside class="sidebar">
-                <div class="card">
-                    <h3><i class="fa-solid fa-sliders"></i> Controls</h3>
-                    <div class="form-group">
-                        <label for="project-name">Project Name</label>
-                        <input type="text" id="project-name" class="input-field" placeholder="Enter project name...">
-                    </div>
-                    <div class="form-group">
-                        <label for="category">Category</label>
-                        <select id="category" class="select-field">
-                            <option value="web">Web Application</option>
-                            <option value="game">Game Design</option>
-                            <option value="ai">AI Tool</option>
-                        </select>
-                    </div>
-                    <button class="btn btn-primary">
-                        <i class="fa-solid fa-plus"></i> Create New
-                    </button>
-                </div>
-            </aside>
-
-            <!-- Content Area -->
-            <section class="content-area">
-                <div class="card">
-                    <h3><i class="fa-solid fa-code"></i> Main Display</h3>
-                    <p class="description-text">
-                        ဒီမှာ သင့်ရဲ့ Application Content သို့မဟုတ် Work Area ကို ထည့်သွင်း အသုံးပြုနိုင်ပါတယ်။
-                    </p>
-                    <div class="action-bar">
-                        <button class="btn btn-secondary">
-                            <i class="fa-solid fa-download"></i> Export File
-                        </button>
-                        <button class="btn btn-outline">
-                            <i class="fa-solid fa-rotate-right"></i> Reset
-                        </button>
-                    </div>
-                </div>
-            </section>
-        </main>
-
+  <!-- Screen 1: Main Container (4 Tabs) -->
+  <div id="mainScreen" class="screen hidden">
+    <div class="main-header">
+      <div class="header-left">
+        <span id="headerTitle" style="font-size: 18px; font-weight: 700; color:#fff;">Chats</span>
+      </div>
+      <div class="header-actions">
+        <button id="searchUsersBtn" class="icon-btn hidden" onclick="openSearchScreen()" title="User ရှာရန်">🔍</button>
+      </div>
     </div>
 
+    <!-- Tab 1: Chats List -->
+    <div id="chatsTabContainer" class="chat-list-container">
+      <button class="fab-btn" onclick="openNewCreationModal()" title="ဖန်တီးမည်">✎</button>
+    </div>
+    
+    <!-- Tab 2: Contacts -->
+    <div id="contactsTabContainer" class="chat-list-container hidden">
+      <div style="padding:15px;">
+        <input type="text" class="input-control" placeholder="🔍 သူငယ်ချင်းများ ရှာရန်..." oninput="searchContacts(this.value)">
+      </div>
+      <div id="contactsListResults"></div>
+    </div>
+
+    <!-- Tab 3: Settings -->
+    <div id="settingsTabContainer" class="chat-list-container hidden">
+      <div style="padding: 10px;">
+        <div style="padding:14px; background:#222327; border-radius:12px; margin-bottom:15px;">
+          <div style="font-weight:600; color:#fff; margin-bottom:8px;">Switch Accounts (အကောင့်ပြောင်းရန်)</div>
+          <div class="account-switcher-row" id="accountsListContainer"></div>
+          <button class="btn secondary" style="margin-top:10px; font-size:13px; padding:8px;" onclick="location.reload()">+ အကောင့်အသစ် ထပ်ထည့်ရန်</button>
+        </div>
+
+        <div class="settings-list-item" onclick="openApiGuideModal()" style="display:flex; align-items:center; padding:14px; gap:15px; cursor:pointer; border-bottom:1px solid #2f3136;">
+          <span style="font-size:20px;">❓</span>
+          <div><div style="font-weight:600; color:#fff;">API Key ယူနည်း လမ်းညွှန်</div><div style="font-size:12px; color:#8e9297;">Gemini API Key ဘယ်လိုယူရမလဲ</div></div>
+        </div>
+
+        <div class="settings-list-item" onclick="openApiModal()" style="display:flex; align-items:center; padding:14px; gap:15px; cursor:pointer; border-bottom:1px solid #2f3136;">
+          <span style="font-size:20px;">🔑</span>
+          <div><div style="font-weight:600; color:#fff;">AI API Keys</div><div style="font-size:12px; color:#8e9297;">Gemini API Keys ထည့်ရန်</div></div>
+        </div>
+        <div class="settings-list-item" onclick="logoutGoogle()" style="display:flex; align-items:center; padding:14px; gap:15px; cursor:pointer;">
+          <span style="font-size:20px; color:#ff4757;">🚪</span>
+          <div style="font-weight:600; color:#ff4757;">Log Out (အကောင့်ထွက်မည်)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: Profile Screen -->
+    <div id="profileTabContainer" class="profile-container hidden">
+      <div id="profileBannerView" class="profile-banner" onclick="document.getElementById('bannerUpload').click()"></div>
+      <input type="file" id="bannerUpload" accept="image/*" class="hidden" onchange="handleBannerUpload(event)">
+
+      <input type="file" id="myProfileUpload" accept="image/*,video/*" class="hidden" onchange="handleProfileMediaUpload(event)">
+      <img src="" id="profileScreenPic" class="profile-big-pic" onclick="document.getElementById('myProfileUpload').click()">
+      
+      <div class="profile-name" id="profileScreenName">Name</div>
+      <div class="profile-status" id="profileStatusIndicator">online</div>
+
+      <div class="profile-actions-grid">
+        <div class="profile-action-btn" onclick="document.getElementById('myProfileUpload').click()"><span>📷</span> Media / Video</div>
+        <div class="profile-action-btn" onclick="openEditNameModal('name')"><span>✏️</span> Edit Info</div>
+        <div class="profile-action-btn" onclick="switchMainTab('settings')"><span>⚙️</span> Settings</div>
+      </div>
+
+      <div class="profile-info-card" onclick="openPhoneModal()">
+        <div class="profile-info-title">Phone Number</div>
+        <div class="profile-info-val" id="profileScreenPhone">ဖုန်းနံပတ် ထည့်ရန်... 📱</div>
+      </div>
+
+      <div class="profile-info-card" onclick="openEditBioModal()">
+        <div class="profile-info-title">Bio</div>
+        <div class="profile-info-val" id="profileScreenBio">Bio ရေးရန်... ✏️</div>
+      </div>
+
+      <div class="profile-info-card" onclick="openEditNameModal('username')">
+        <div class="profile-info-title">Username</div>
+        <div class="profile-info-val" id="profileScreenUsername">@username ✏️</div>
+      </div>
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+      <button class="nav-tab active" id="tabChatsBtn" onclick="switchMainTab('chats')"><span class="icon">💬</span><span>Chats</span></button>
+      <button class="nav-tab" id="tabContactsBtn" onclick="switchMainTab('contacts')"><span class="icon">👥</span><span>Contacts</span></button>
+      <button class="nav-tab" id="tabSettingsBtn" onclick="switchMainTab('settings')"><span class="icon">⚙️</span><span>Settings</span></button>
+      <button class="nav-tab" id="tabProfileBtn" onclick="switchMainTab('profile')"><img id="bottomNavProfilePic" src=""><span>Profile</span></button>
+    </div>
+  </div>
+
+  <!-- Search Screen with Real Results & Similarity Matches -->
+  <div id="searchScreen" class="screen slide-in-right">
+    <div class="main-header">
+      <div class="header-left">
+        <button class="back-btn" onclick="closeSearchScreen()">❮</button>
+        <span style="font-size: 18px; font-weight: 700; color:#fff;">User သို့မဟုတ် Group ရှာရန်</span>
+      </div>
+    </div>
+    <div style="padding: 15px;"><input type="text" id="userSearchInput" class="input-control" placeholder="နာမည် သို့မဟုတ် @username (သို့) Group Username..." oninput="searchUsersAndGroups(this.value)" style="margin-bottom:0;"></div>
+    <div class="chat-list-container" id="searchResultsContainer"></div>
+  </div>
+
+  <!-- Chat Room -->
+  <div id="chatRoomScreen" class="screen slide-in-right">
+    <div class="chat-header">
+      <div class="chat-header-left" onclick="openChatInfoModal()">
+        <img src="" id="chatHeaderPic" class="chat-ai-pic">
+        <div>
+          <div class="chat-header-name" id="chatHeaderName">Name</div>
+          <div id="chatHeaderStatus" style="font-size:11px; color:#8e9297;">online</div>
+        </div>
+      </div>
+      <div>
+        <button class="icon-btn" onclick="document.getElementById('chatImageUpload').click()" title="ပုံပို့ရန်" style="display:inline-flex; width:35px; height:35px; font-size:16px;">🖼️</button>
+        <input type="file" id="chatImageUpload" accept="image/*" class="hidden" onchange="sendImageMessage(event)">
+      </div>
+    </div>
+    <div class="chat-history" id="chatHistoryBox"></div>
+    
+    <div class="chat-input-area">
+      <div class="chat-input-row">
+        <input type="text" id="msgInput" class="chat-input" placeholder="Message " onkeypress="if(event.key==='Enter') sendMessage()">
+        <button class="send-btn" onclick="sendMessage()">➤</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- API Key Guide Modal -->
+  <div id="apiGuideModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'apiGuideModal')">
+    <div class="modal-content">
+      <h3 style="margin-top:0; color:#fff; text-align:center;">🔑 API Key ယူနည်း လမ်းညွှန်</h3>
+      <p style="font-size: 14px; color: #8e9297; line-height: 1.5;">
+        ၁။ Google AI Studio ဝဘ်ဆိုဒ် (<a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:#5288c1;">aistudio.google.com</a>) သို့သွားပါ။<br><br>
+        ၂။ သင့် Google အကောင့်ဖြင့် Sign in ဝင်ပါ။<br><br>
+        ၃။ <b>'Create API Key'</b> ကို နှိပ်ပြီး Key အသစ်ထုတ်ယူပါ။<br><br>
+        ၄။ ရလာသော 'AIza...' ဖြင့်စသည့် Key ကို Copy ကူးပြီး App ထဲရှိ Settings > AI API Keys ထဲတွင် ထည့်သွင်းအသုံးပြုပါ။
+      </p>
+      <button class="btn" onclick="closeModal('apiGuideModal')">နားလည်ပါပြီ</button>
+    </div>
+  </div>
+
+  <!-- Chat Info Modal (View Info, Delete Chat & Wallpaper) -->
+  <div id="chatInfoModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'chatInfoModal')">
+    <div class="modal-content" style="text-align: center;">
+      <img id="infoModalPic" src="" style="width:100px; height:100px; border-radius:50%; object-fit:cover; margin-bottom:10px;">
+      <h2 id="infoModalName" style="margin:5px 0; color:#fff;">Name</h2>
+      <p id="infoModalSub" style="color:#5288c1; font-weight:600; margin:0 0 10px 0;">@username</p>
+      <p id="infoModalDetails" style="color:#8e9297; font-style:italic; margin:0 0 20px 0;">Details...</p>
+      
+      <input type="file" id="chatBgUpload" accept="image/*" class="hidden" onchange="handleChatBgUpload(event)">
+      <button class="btn secondary" style="margin-bottom:8px;" onclick="document.getElementById('chatBgUpload').click()">🖼️ Chat Wallpaper ပြောင်းရန်</button>
+      
+      <button class="btn" style="background:#ff4757; margin-top:8px;" onclick="deleteCurrentChat()">🗑️ ဒီ Chat ကို ဖျက်မည်</button>
+      
+      <div id="groupInviteSection" class="hidden" style="margin-top:15px; border-top:1px solid #2f3136; padding-top:12px;">
+        <h4 style="margin:0 0 8px 0; color:#fff;">Contacts ထဲမှ သူငယ်ချင်း/AI ထည့်ရန်</h4>
+        <div id="inviteContactsList" style="max-height:120px; overflow-y:auto; text-align:left; margin-bottom:10px;"></div>
+      </div>
+
+      <button class="btn secondary" style="margin-top:10px;" onclick="closeModal('chatInfoModal')">ပိတ်မည်</button>
+    </div>
+  </div>
+
+  <!-- Separate Creation Modal: AI Creation & Group Creation -->
+  <div id="newCreationModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'newCreationModal')">
+    <div class="modal-content">
+      <h3 style="margin-top:0; color:#fff; text-align:center;">ဖန်တီးမည့် အမျိုးအစား ရွေးပါ</h3>
+      <div style="display:flex; gap:10px; margin-bottom:15px;">
+        <button class="btn" onclick="openAiCreationForm()" style="margin-top:0;">🤖 AI ဖန်တီးမည်</button>
+        <button class="btn secondary" onclick="openGroupCreationForm()" style="margin-top:0;">👥 Group ဖန်တီးမည်</button>
+      </div>
+      <button class="btn secondary" onclick="closeModal('newCreationModal')">ပိတ်မည်</button>
+    </div>
+  </div>
+
+  <!-- AI Creation Form Modal -->
+  <div id="aiCreationModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'aiCreationModal')">
+    <div class="modal-content">
+      <h3 style="margin-top:0; color:#fff; text-align:center;">🤖 AI အဖော် ဖန်တီးမည်</h3>
+      <input type="file" id="aiPicUpload" accept="image/*" class="hidden" onchange="handleAiPicUpload(event)">
+      <div style="width:70px; height:70px; border-radius:50%; background:#141517; margin:0 auto 12px auto; display:flex; justify-content:center; align-items:center; cursor:pointer; overflow:hidden; border:2px dashed #5288c1;" onclick="document.getElementById('aiPicUpload').click()">
+        <img id="aiPicPreview" src="" class="hidden" style="width:100%; height:100%; object-fit:cover;">
+        <span id="aiPicPlus" style="font-size:24px; color:#8e9297;">+</span>
+      </div>
+      <input type="text" id="aiNameInput" class="input-control" placeholder="AI နာမည် (ဥပမာ - Chou, Nami)">
+      <div style="display:flex; gap:10px;">
+        <input type="number" id="aiAgeInput" class="input-control" placeholder="အသက်" value="18">
+        <select id="aiGenderInput" class="input-control">
+          <option value="female">မ 🙋‍♀️</option>
+          <option value="male">ကျား 🙋‍♂️</option>
+        </select>
+      </div>
+      <select id="aiRelationInput" class="input-control">
+        <option value="friend">သူငယ်ချင်း</option>
+        <option value="jf">Just Friend</option>
+        <option value="romantic">ချစ်သူ (Romantic)</option>
+        <option value="sibling">မောင်နှမ</option>
+      </select>
+      <label style="font-size:12px; color:#8e9297; display:flex; align-items:center; gap:8px; margin-bottom:12px; cursor:pointer;">
+        <input type="checkbox" id="isLivePhotoCheck" style="width:16px; height:16px; accent-color:#5288c1;"> 🌟 Live Photo (လှုပ်ရှားမှုပုံစံ သတ်မှတ်မည်)
+      </label>
+      <button class="btn" onclick="saveCreatedAI()">AI ဖန်တီးမည်</button>
+      <button class="btn secondary" onclick="closeModal('aiCreationModal')">ပိတ်မည်</button>
+    </div>
+  </div>
+
+  <!-- Group Creation Form Modal -->
+  <div id="groupCreationModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'groupCreationModal')">
+    <div class="modal-content">
+      <h3 style="margin-top:0; color:#fff; text-align:center;">👥 Group ဖန်တီးမည်</h3>
+      <input type="file" id="groupPicUpload" accept="image/*" class="hidden" onchange="handleGroupPicUpload(event)">
+      <div style="width:70px; height:70px; border-radius:50%; background:#141517; margin:0 auto 12px auto; display:flex; justify-content:center; align-items:center; cursor:pointer; overflow:hidden; border:2px dashed #5288c1;" onclick="document.getElementById('groupPicUpload').click()">
+        <img id="groupPicPreview" src="" class="hidden" style="width:100%; height:100%; object-fit:cover;">
+        <span id="groupPicPlus" style="font-size:24px; color:#8e9297;">+</span>
+      </div>
+      <input type="text" id="groupNameInput" class="input-control" placeholder="Group နာမည်">
+      <input type="text" id="groupUsernameInput" class="input-control" placeholder="Group Username (ဥပမာ - @mygroup)">
+      <button class="btn" onclick="saveCreatedGroup()">Group တည်ဆောက်မည်</button>
+      <button class="btn secondary" onclick="closeModal('groupCreationModal')">ပိတ်မည်</button>
+    </div>
+  </div>
+
+  <!-- Join Group Confirm Modal -->
+  <div id="joinGroupModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'joinGroupModal')">
+    <div class="modal-content" style="text-align:center;">
+      <h3 id="joinGroupName" style="color:#fff; margin-top:0;">Group Name</h3>
+      <p id="joinGroupUsername" style="color:#5288c1; margin-bottom:20px;">@groupusername</p>
+      <button class="btn" onclick="confirmJoinGroup()">👉 Join မည် (ဝင်ရောက်မည်)</button>
+      <button class="btn secondary" onclick="closeModal('joinGroupModal')">ပိတ်မည်</button>
+    </div>
+  </div>
+
+  <!-- Other Modals -->
+  <div id="userProfileModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'userProfileModal')">
+    <div class="modal-content" style="text-align: center;">
+      <img id="modalProfilePic" src="" style="width:100px; height:100px; border-radius:50%; object-fit:cover; margin-bottom:10px;">
+      <h2 id="modalProfileName" style="margin:5px 0; color:#fff;">Name</h2>
+      <p id="modalProfileUsername" style="color:#5288c1; font-weight:600; margin:0 0 10px 0;">@username</p>
+      <p id="modalProfileBio" style="color:#8e9297; font-style:italic; margin:0 0 20px 0;">Bio...</p>
+      <button class="btn" onclick="startChatWithSelectedUser()">💬 ချက်တင်စတင်မည်</button>
+      <button class="btn secondary" onclick="closeModal('userProfileModal')">ပိတ်မည်</button>
+    </div>
+  </div>
+
+  <div id="phoneModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'phoneModal')">
+    <div class="modal-content">
+      <h3 style="margin-top:0; color:#fff; text-align:center;">ဖုန်းနံပတ် ထည့်ရန်</h3>
+      <input type="text" id="phoneInput" class="input-control" placeholder="ဥပမာ - +95 9XXXXXXXX">
+      <button class="btn" onclick="savePhoneNumber()">သိမ်းမည်</button>
+      <button class="btn secondary" onclick="closeModal('phoneModal')">ပိတ်မည်</button>
+    </div>
+  </div>
+
+  <div id="editBioModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'editBioModal')">
+    <div class="modal-content">
+      <h3 style="margin-top:0; color:#fff; text-align:center;">Bio ပြောင်းရန်</h3>
+      <textarea id="bioInput" class="input-control" placeholder="သင့်အကြောင်း..." style="height:90px; resize:none;"></textarea>
+      <button class="btn" onclick="saveBio()">သိမ်းမည်</button>
+      <button class="btn secondary" onclick="closeModal('editBioModal')">ပိတ်မည်</button>
+    </div>
+  </div>
+
+  <div id="editNameModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'editNameModal')">
+    <div class="modal-content">
+      <h3 id="editModalTitle" style="margin-top:0; color:#fff; text-align:center;">ပြောင်းရန်</h3>
+      <input type="text" id="editNameInput" class="input-control" placeholder="အသစ်ထည့်ရန်">
+      <button class="btn" onclick="saveUpdatedName()">ပြောင်းမည်</button>
+      <button class="btn secondary" onclick="closeModal('editNameModal')">ပိတ်မည်</button>
+    </div>
+  </div>
+
+  <div id="apiModal" class="modal-overlay" onclick="closeModalOnOutsideClick(event, 'apiModal')">
+    <div class="modal-content">
+      <h3 style="margin-top:0; color:#fff; text-align:center;">🔑 AI API Keys</h3>
+      <div id="apiKeysContainer" style="display:flex; flex-direction:column; gap:8px; max-height:220px; overflow-y:auto; margin-bottom:12px;"></div>
+      <button class="btn" onclick="addApiKeyInput()">+ ထပ်ထည့်ရန်</button>
+      <button class="btn" onclick="saveApiKeys()">Save Keys</button>
+      <button class="btn secondary" onclick="closeModal('apiModal')">ပိတ်မည်</button>
+    </div>
+  </div>
+
+  <!-- Custom External JavaScript (Module) -->
+  <script type="module" src="script.js"></script>
 </body>
 </html>
