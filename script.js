@@ -62,11 +62,13 @@ window.subP2PMessages = function(roomId, callback) {
   });
 };
 
-window.sendP2PMessageToFirestore = async function(roomId, text) {
+window.sendP2PMessageToFirestore = async function(roomId, text, bubbleBg) {
   try {
     await addDoc(collection(db, "p2p_chats", roomId, "messages"), {
       senderId: window.firebaseUserUid || currentUid,
-      content: text, timestamp: serverTimestamp()
+      content: text, 
+      bubbleBg: bubbleBg || '#2b5278',
+      timestamp: serverTimestamp()
     });
   } catch(e) {}
 };
@@ -77,10 +79,18 @@ let currentUid = localStorage.getItem('currentAccountUid') || null;
 let appState = {
   myUserName: 'Real human', myUsernameHandle: '@user',
   myBio: '', myPhone: '', myProfilePic: null, myBanner: null,
-  apiKeys: [], chats: [], currentChatId: null
+  apiKeys: [], chats: [], currentChatId: null,
+  userBubbleBg: '#2b5278' // ကိုယ်ပို့တဲ့စာ ဘေဘယ်လ်အရောင်အတွက် State
 };
 
 const defaultPic = "https://ui-avatars.com/api/?name=User&background=5288c1&color=fff";
+
+// မက်ဆေ့ချ်ဘေဘယ်လ် အရောင်ပြောင်းရန် Function (စပြောင်းချိန်မှစ၍ အသစ်ပို့မသာ ပြောင်းမည်)
+window.setUserBubbleColor = function(color) {
+  appState.userBubbleBg = color;
+  saveCurrentAccountData();
+  alert("မက်ဆေ့ချ်ဘေဘယ်လ် အရောင်ပြောင်းလဲပြီးပါပြီ။ (စာအသစ်များမှ စတင်သက်ရောက်မည်)");
+};
 
 window.handleGoogleLoginSuccess = function(user) {
   window.firebaseUserUid = user.uid;
@@ -91,7 +101,7 @@ window.handleGoogleLoginSuccess = function(user) {
       uid: user.uid, name: user.displayName || 'User',
       username: '@' + user.email.split('@')[0],
       bio: '', phone: '', pic: user.photoURL || defaultPic, banner: '',
-      chats: [], apiKeys: []
+      chats: [], apiKeys: [], userBubbleBg: '#2b5278'
     };
     accounts.push(acc);
   }
@@ -114,7 +124,8 @@ window.loginWithBypassKey = function() {
       id: 'welcome_ai', type: 'ai', name: 'AI Companion 🤖', age: '18', gender: 'female', relation: 'friend',
       pic: defaultPic, messages: [{ role: 'model', content: 'ဟယ်လို! Key ဖြင့် အောင်မြင်စွာ ဝင်ရောက်ပြီးပါပြီ။ မင်္ဂလာပါရှင့်။' }], lastUpdated: Date.now()
     }],
-    apiKeys: [{ key: key, provider: 'gemini' }]
+    apiKeys: [{ key: key, provider: 'gemini' }],
+    userBubbleBg: '#2b5278'
   };
   accounts.push(acc);
   saveAccounts();
@@ -137,6 +148,7 @@ function switchAccount(uid) {
     appState.myBanner = acc.banner;
     appState.chats = acc.chats || [];
     appState.apiKeys = acc.apiKeys || [];
+    appState.userBubbleBg = acc.userBubbleBg || '#2b5278';
     window.syncUserProfileToCloud(uid, appState.myUserName, appState.myUsernameHandle, appState.myProfilePic, appState.myBio, appState.myPhone, Date.now());
   }
   renderChatLists(); updateProfileUI(); renderAccountSwitcher();
@@ -149,6 +161,7 @@ function saveCurrentAccountData() {
     acc.bio = appState.myBio; acc.phone = appState.myPhone;
     acc.pic = appState.myProfilePic; acc.banner = appState.myBanner;
     acc.chats = appState.chats; acc.apiKeys = appState.apiKeys;
+    acc.userBubbleBg = appState.userBubbleBg;
     saveAccounts();
     window.syncUserProfileToCloud(currentUid, appState.myUserName, appState.myUsernameHandle, appState.myProfilePic, appState.myBio, appState.myPhone, Date.now());
   }
@@ -367,7 +380,8 @@ window.openChatRoom = function(chatId) {
       chat.messages = msgs.map(m => ({
         id: m.id, senderId: m.senderId,
         role: m.senderId === currentUid ? 'user' : 'model',
-        content: m.content
+        content: m.content,
+        bubbleBg: m.bubbleBg || '#2b5278'
       }));
       renderChatHistory(chat);
     });
@@ -384,7 +398,17 @@ function renderChatHistory(chat) {
   chat.messages.forEach((m, idx) => {
     let row = document.createElement('div'); row.className = 'msg-row';
     let d = document.createElement('div');
-    d.className = `msg-bubble ${m.role === 'user' ? 'msg-user' : 'msg-bot'}`;
+    
+    // ကိုယ်ပို့တဲ့စာ (user) ဖြစ်ပါက သိမ်းဆည်းထားသော bubbleBg အရောင်အတိုင်း ပုံဖော်ပေးမည် (စာဟောင်းများ မပြောင်းလဲပါ)
+    if (m.role === 'user') {
+      d.className = 'msg-bubble msg-user';
+      if (m.bubbleBg) {
+        d.style.background = m.bubbleBg;
+      }
+    } else {
+      d.className = 'msg-bubble msg-bot';
+      d.style.background = ''; // Bot အတွက် မူလအတိုင်း
+    }
     
     let contentHtml = '';
     if (m.isLive) {
@@ -471,7 +495,7 @@ window.sendImageMessage = function(e) {
   reader.onload = ev => {
     let chat = appState.chats.find(c => c.id === appState.currentChatId);
     let imgMsg = 'img:' + ev.target.result;
-    chat.messages.push({ role: 'user', content: imgMsg });
+    chat.messages.push({ role: 'user', content: imgMsg, bubbleBg: appState.userBubbleBg });
     chat.lastUpdated = Date.now();
     saveCurrentAccountData();
     renderChatHistory(chat);
@@ -503,9 +527,10 @@ window.sendMessage = async function() {
   input.value = '';
 
   if (chat.type === 'p2p') {
-    window.sendP2PMessageToFirestore(chat.id, text);
+    window.sendP2PMessageToFirestore(chat.id, text, appState.userBubbleBg);
   } else {
-    chat.messages.push({ role: 'user', content: text });
+    // ပို့လိုက်တဲ့အချိန်ရဲ့ အရောင်ကိုပါ Message Object ထဲ ထည့်သိမ်းခြင်း
+    chat.messages.push({ role: 'user', content: text, bubbleBg: appState.userBubbleBg });
     chat.lastUpdated = Date.now(); 
     saveCurrentAccountData();
     renderChatHistory(chat);
