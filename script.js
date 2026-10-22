@@ -18,9 +18,7 @@ const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
 getRedirectResult(auth).then((result) => {
-  if (result && result.user) {
-    handleGoogleLoginSuccess(result.user);
-  }
+  if (result && result.user) handleGoogleLoginSuccess(result.user);
 }).catch((error) => { console.error(error); });
 
 window.loginWithGoogle = function() { signInWithRedirect(auth, provider); };
@@ -62,12 +60,13 @@ window.subP2PMessages = function(roomId, callback) {
   });
 };
 
-window.sendP2PMessageToFirestore = async function(roomId, text, bubbleBg) {
+window.sendP2PMessageToFirestore = async function(roomId, text, bubbleBg, replyTo) {
   try {
     await addDoc(collection(db, "p2p_chats", roomId, "messages"), {
       senderId: window.firebaseUserUid || currentUid,
       content: text, 
       bubbleBg: bubbleBg || '#2b5278',
+      replyTo: replyTo || null,
       timestamp: serverTimestamp()
     });
   } catch(e) {}
@@ -80,16 +79,17 @@ let appState = {
   myUserName: 'Real human', myUsernameHandle: '@user',
   myBio: '', myPhone: '', myProfilePic: null, myBanner: null,
   apiKeys: [], chats: [], currentChatId: null,
-  userBubbleBg: '#2b5278' // ကိုယ်ပို့တဲ့စာ ဘေဘယ်လ်အရောင်အတွက် State
+  userBubbleBg: '#2b5278',
+  replyingMessage: null,
+  selectedMsgIndices: [],
+  isSelectMode: false
 };
 
 const defaultPic = "https://ui-avatars.com/api/?name=User&background=5288c1&color=fff";
 
-// မက်ဆေ့ချ်ဘေဘယ်လ် အရောင်ပြောင်းရန် Function (စပြောင်းချိန်မှစ၍ အသစ်ပို့မသာ ပြောင်းမည်)
 window.setUserBubbleColor = function(color) {
   appState.userBubbleBg = color;
   saveCurrentAccountData();
-  alert("မက်ဆေ့ချ်ဘေဘယ်လ် အရောင်ပြောင်းလဲပြီးပါပြီ။ (စာအသစ်များမှ စတင်သက်ရောက်မည်)");
 };
 
 window.handleGoogleLoginSuccess = function(user) {
@@ -110,7 +110,7 @@ window.handleGoogleLoginSuccess = function(user) {
   document.getElementById('loginScreen').classList.add('hidden');
   document.getElementById('mainScreen').classList.remove('hidden');
   renderChatLists(); updateProfileUI(); renderAccountSwitcher();
-}
+};
 
 window.loginWithBypassKey = function() {
   let key = document.getElementById('bypassKeyInput').value.trim();
@@ -367,6 +367,11 @@ function renderChatLists() {
 
 window.openChatRoom = function(chatId) {
   appState.currentChatId = chatId;
+  appState.isSelectMode = false;
+  appState.selectedMsgIndices = [];
+  appState.replyingMessage = null;
+  updateSelectionHeaderUI();
+
   let chat = appState.chats.find(c => c.id === chatId);
   document.getElementById('chatHeaderName').innerText = chat.name;
   document.getElementById('chatHeaderPic').src = chat.pic || defaultPic;
@@ -381,7 +386,9 @@ window.openChatRoom = function(chatId) {
         id: m.id, senderId: m.senderId,
         role: m.senderId === currentUid ? 'user' : 'model',
         content: m.content,
-        bubbleBg: m.bubbleBg || '#2b5278'
+        bubbleBg: m.bubbleBg || '#2b5278',
+        replyTo: m.replyTo || null,
+        reactions: m.reactions || []
       }));
       renderChatHistory(chat);
     });
@@ -392,39 +399,280 @@ window.openChatRoom = function(chatId) {
   activeScreenHistory.push('chatRoomScreen');
 };
 
+// =================== CHAT HISTORY & INTERACTION SYSTEM ===================
+
 function renderChatHistory(chat) {
   const box = document.getElementById('chatHistoryBox');
   box.innerHTML = '';
+  
   chat.messages.forEach((m, idx) => {
-    let row = document.createElement('div'); row.className = 'msg-row';
+    let row = document.createElement('div'); 
+    row.className = 'msg-row';
+    if (appState.selectedMsgIndices.includes(idx)) row.classList.add('msg-selected');
+
     let d = document.createElement('div');
-    
-    // ကိုယ်ပို့တဲ့စာ (user) ဖြစ်ပါက သိမ်းဆည်းထားသော bubbleBg အရောင်အတိုင်း ပုံဖော်ပေးမည် (စာဟောင်းများ မပြောင်းလဲပါ)
     if (m.role === 'user') {
       d.className = 'msg-bubble msg-user';
-      if (m.bubbleBg) {
-        d.style.background = m.bubbleBg;
-      }
+      if (m.bubbleBg) d.style.background = m.bubbleBg;
     } else {
       d.className = 'msg-bubble msg-bot';
-      d.style.background = ''; // Bot အတွက် မူလအတိုင်း
     }
-    
+
     let contentHtml = '';
-    if (m.isLive) {
-      contentHtml += `<span class="live-photo-badge">🌟 Live Photo (Animation)</span><br>`;
+    // စာထောက်ထားပါက ထောက်ထားသည့် စာတိုလေး ပေါ်ရန်
+    if (m.replyTo) {
+      contentHtml += `<div class="reply-preview-box" style="background:rgba(0,0,0,0.2); padding:4px 8px; border-left:3px solid #5288c1; border-radius:4px; margin-bottom:5px; font-size:12px; color:#ddd;">${m.replyTo}</div>`;
     }
+    if (m.isLive) contentHtml += `<span class="live-photo-badge">🌟 Live Photo (Animation)</span><br>`;
+    
     if (m.content.startsWith('img:')) {
       contentHtml += `<img src="${m.content.substring(4)}" style="max-width:100%; border-radius:10px; margin-top:4px;">`;
     } else {
       contentHtml += m.content.replace(/\n/g, '<br>');
     }
+
+    // Reaction တံဆိပ်လေးများ ပြသရန်
+    if (m.reactions && m.reactions.length > 0) {
+      contentHtml += `<div class="reaction-tag-container" style="display:flex; gap:2px; margin-top:4px;">${m.reactions.map(r => `<span style="font-size:12px; background:rgba(0,0,0,0.3); border-radius:8px; padding:1px 4px;">${r}</span>`).join('')}</div>`;
+    }
+
     d.innerHTML = contentHtml;
     row.appendChild(d);
+
+    // --- SWIPE TO REPLY & LONG PRESS & CLICK EVENTS ---
+    let startX = 0, currentX = 0, isDragging = false, pressTimer = null;
+
+    // Touch Start (ဖိနှိပ်ခြင်း သို့မဟုတ် Swipe စတင်ခြင်း)
+    row.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+      pressTimer = setTimeout(() => {
+        // Long Press: Select Mode ဖွင့်ခြင်း
+        if (isDragging) {
+          appState.isSelectMode = true;
+          toggleMessageSelection(idx);
+          if (window.navigator.vibrate) window.navigator.vibrate(50);
+        }
+      }, 500);
+    }, { passive: true });
+
+    // Touch Move (ဘေးသို့ ဆွဲရွှေ့ခြင်း - Swipe Right to Reply)
+    row.addEventListener('touchmove', (e) => {
+      currentX = e.touches[0].clientX;
+      let diffX = currentX - startX;
+      if (Math.abs(diffX) > 10) clearTimeout(pressTimer);
+      if (diffX > 0 && diffX < 80) {
+        row.style.transform = `translateX(${diffX}px)`;
+      }
+    }, { passive: true });
+
+    // Touch End (လက်လွှတ်လိုက်သည့်အခါ)
+    row.addEventListener('touchend', (e) => {
+      clearTimeout(pressTimer);
+      let diffX = currentX - startX;
+      row.style.transform = `translateX(0px)`;
+      if (diffX > 50 && isDragging) {
+        // Swipe အောင်မြင်ပါက Reply ထောက်မည်
+        setReplyMessage(m.content);
+      }
+      isDragging = false;
+      startX = 0; currentX = 0;
+    });
+
+    // Click Event (တစ်ချက်နှိပ်ပါက Action Menu ပေါ်ရန်)
+    row.onclick = (e) => {
+      if (appState.isSelectMode) {
+        toggleMessageSelection(idx);
+      } else {
+        openMessageContextMenu(m, idx);
+      }
+    };
+
     box.appendChild(row);
   });
   box.scrollTop = box.scrollHeight;
 }
+
+// --- REPLY UI CONTROLLER ---
+function setReplyMessage(text) {
+  appState.replyingMessage = text;
+  let replyBar = document.getElementById('chatReplyBar');
+  if (!replyBar) {
+    replyBar = document.createElement('div');
+    replyBar.id = 'chatReplyBar';
+    replyBar.style.cssText = "background:#222327; padding:8px 12px; display:flex; justify-content:space-between; align-items:center; border-left:4px solid #5288c1; font-size:13px;";
+    document.querySelector('.chat-input-area').prepend(replyBar);
+  }
+  replyBar.innerHTML = `<div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#E4E6EB;"><strong>Replying:</strong> ${text}</div><button onclick="cancelReply()" style="background:none; border:none; color:#8e9297; font-size:16px; cursor:pointer;">✕</button>`;
+}
+
+window.cancelReply = function() {
+  appState.replyingMessage = null;
+  let replyBar = document.getElementById('chatReplyBar');
+  if (replyBar) replyBar.remove();
+};
+
+// --- CLICK CONTEXT MENU (Reactions, Delete, Bubble Style) ---
+function openMessageContextMenu(msg, index) {
+  let isUser = msg.role === 'user';
+  let existingModal = document.getElementById('msgActionModal');
+  if (existingModal) existingModal.remove();
+
+  let modal = document.createElement('div');
+  modal.id = 'msgActionModal';
+  modal.className = 'modal-overlay active';
+  modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+
+  modal.innerHTML = `
+    <div class="modal-content" style="text-align:center;">
+      <!-- Reaction အတန်း -->
+      <div style="display:flex; justify-content:space-around; font-size:24px; background:#141517; padding:10px; border-radius:15px; margin-bottom:15px;">
+        <span onclick="addReaction(${index}, '❤️')" style="cursor:pointer;">❤️</span>
+        <span onclick="addReaction(${index}, '👍')" style="cursor:pointer;">👍</span>
+        <span onclick="addReaction(${index}, '😂')" style="cursor:pointer;">😂</span>
+        <span onclick="addReaction(${index}, '😮')" style="cursor:pointer;">😮</span>
+        <span onclick="addReaction(${index}, '😢')" style="cursor:pointer;">😢</span>
+        <span onclick="addReaction(${index}, '🙏')" style="cursor:pointer;">🙏</span>
+      </div>
+
+      ${isUser ? `
+      <!-- ကိုယ်ပို့သည့်စာ ဖြစ်ပါက Bubble Color ပြောင်းရန် Option -->
+      <div style="margin-bottom:12px; text-align:left;">
+        <div style="font-size:12px; color:#8e9297; margin-bottom:6px;">နောက်ပို့မည့် စာများ၏ Bubble စတိုင် အရောင်ပြောင်းရန်:</div>
+        <div style="display:flex; gap:10px;">
+          <div onclick="setUserBubbleColor('#2b5278'); closeActionModal();" style="width:28px; height:28px; background:#2b5278; border-radius:50%; cursor:pointer;"></div>
+          <div onclick="setUserBubbleColor('#2e7d32'); closeActionModal();" style="width:28px; height:28px; background:#2e7d32; border-radius:50%; cursor:pointer;"></div>
+          <div onclick="setUserBubbleColor('#6a1b9a'); closeActionModal();" style="width:28px; height:28px; background:#6a1b9a; border-radius:50%; cursor:pointer;"></div>
+          <div onclick="setUserBubbleColor('#d84315'); closeActionModal();" style="width:28px; height:28px; background:#d84315; border-radius:50%; cursor:pointer;"></div>
+        </div>
+      </div>
+      ` : ''}
+
+      <button class="btn secondary" onclick="setReplyMessage('${msg.content.replace(/'/g, "\\'")}'); closeActionModal();">↩️ စာထောက်ပြောမည် (Reply)</button>
+      <button class="btn secondary" onclick="deleteSingleMessage(${index})" style="color:#ff4757;">🗑️ မက်ဆေ့ချ် ဖျက်မည် (Delete)</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+window.closeActionModal = function() {
+  let modal = document.getElementById('msgActionModal');
+  if (modal) modal.remove();
+};
+
+window.addReaction = function(index, reaction) {
+  let chat = appState.chats.find(c => c.id === appState.currentChatId);
+  if (chat && chat.messages[index]) {
+    if (!chat.messages[index].reactions) chat.messages[index].reactions = [];
+    chat.messages[index].reactions.push(reaction);
+    saveCurrentAccountData();
+    renderChatHistory(chat);
+  }
+  closeActionModal();
+};
+
+window.deleteSingleMessage = function(index) {
+  let chat = appState.chats.find(c => c.id === appState.currentChatId);
+  if (chat) {
+    chat.messages.splice(index, 1);
+    saveCurrentAccountData();
+    renderChatHistory(chat);
+  }
+  closeActionModal();
+};
+
+// --- MULTI-SELECT & FORWARD / DELETE SYSTEM ---
+function toggleMessageSelection(index) {
+  let pos = appState.selectedMsgIndices.indexOf(index);
+  if (pos > -1) {
+    appState.selectedMsgIndices.splice(pos, 1);
+  } else {
+    appState.selectedMsgIndices.push(index);
+  }
+
+  if (appState.selectedMsgIndices.length === 0) appState.isSelectMode = false;
+  updateSelectionHeaderUI();
+  let chat = appState.chats.find(c => c.id === appState.currentChatId);
+  renderChatHistory(chat);
+}
+
+function updateSelectionHeaderUI() {
+  let header = document.querySelector('.chat-header');
+  if (appState.isSelectMode) {
+    header.innerHTML = `
+      <div style="display:flex; align-items:center; gap:15px;">
+        <button class="back-btn" onclick="cancelSelection()">✕</button>
+        <span style="font-weight:bold; font-size:16px;">${appState.selectedMsgIndices.length} Selected</span>
+      </div>
+      <div style="display:flex; gap:15px; font-size:18px;">
+        <span onclick="forwardSelectedMessages()" style="cursor:pointer;">↪️ Forward</span>
+        <span onclick="deleteSelectedMessages()" style="cursor:pointer; color:#ff4757;">🗑️</span>
+      </div>
+    `;
+  } else {
+    let chat = appState.chats.find(c => c.id === appState.currentChatId);
+    if (!chat) return;
+    header.innerHTML = `
+      <div class="chat-header-left" onclick="openChatInfoModal()">
+        <button class="back-btn" onclick="goBack(); event.stopPropagation();">❮</button>
+        <img id="chatHeaderPic" src="${chat.pic || defaultPic}" class="chat-ai-pic">
+        <div>
+          <div id="chatHeaderName" class="chat-header-name">${chat.name}</div>
+          <div id="chatHeaderStatus" style="font-size:11px; color:#8e9297;">${chat.type === 'ai' ? 'AI Companion' : (chat.type === 'group' ? 'Group' : 'online')}</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" onclick="openChatInfoModal()">⋮</button>
+      </div>
+    `;
+  }
+}
+
+window.cancelSelection = function() {
+  appState.isSelectMode = false;
+  appState.selectedMsgIndices = [];
+  updateSelectionHeaderUI();
+  let chat = appState.chats.find(c => c.id === appState.currentChatId);
+  renderChatHistory(chat);
+};
+
+window.deleteSelectedMessages = function() {
+  if (confirm("ရွေးချယ်ထားသော စာများကို ဖျက်မှာ သေချာပါသလား?")) {
+    let chat = appState.chats.find(c => c.id === appState.currentChatId);
+    chat.messages = chat.messages.filter((_, idx) => !appState.selectedMsgIndices.includes(idx));
+    saveCurrentAccountData();
+    cancelSelection();
+  }
+};
+
+window.forwardSelectedMessages = function() {
+  let chat = appState.chats.find(c => c.id === appState.currentChatId);
+  let selectedTexts = appState.selectedMsgIndices.map(i => chat.messages[i].content);
+  
+  let targetChatNames = appState.chats.map(c => c.name).join('\n');
+  let chosenName = prompt(`မည်သည့် Chat သို့ Forward ပို့မလဲ နာမည်ရိုက်ထည့်ပါ:\n\n${targetChatNames}`);
+  
+  if (chosenName) {
+    let targetChat = appState.chats.find(c => c.name.toLowerCase() === chosenName.trim().toLowerCase());
+    if (targetChat) {
+      selectedTexts.forEach(txt => {
+        targetChat.messages.push({
+          role: 'user',
+          content: `↪️ Forwarded:\n${txt}`,
+          bubbleBg: appState.userBubbleBg
+        });
+      });
+      targetChat.lastUpdated = Date.now();
+      saveCurrentAccountData();
+      alert("Forward စာများ အောင်မြင်စွာ ပို့ပြီးပါပြီ။");
+      cancelSelection();
+    } else {
+      alert("Chat အမည် မတွေ့ပါ။");
+    }
+  }
+};
+
+// =========================================================================
 
 window.openChatInfoModal = function() {
   let chat = appState.chats.find(c => c.id === appState.currentChatId);
@@ -526,11 +774,18 @@ window.sendMessage = async function() {
   let chat = appState.chats.find(c => c.id === appState.currentChatId);
   input.value = '';
 
+  let replyTextPayload = appState.replyingMessage;
+  cancelReply(); // Send ပီးပါက Reply Bar ကို ပြန်ပိတ်မည်
+
   if (chat.type === 'p2p') {
-    window.sendP2PMessageToFirestore(chat.id, text, appState.userBubbleBg);
+    window.sendP2PMessageToFirestore(chat.id, text, appState.userBubbleBg, replyTextPayload);
   } else {
-    // ပို့လိုက်တဲ့အချိန်ရဲ့ အရောင်ကိုပါ Message Object ထဲ ထည့်သိမ်းခြင်း
-    chat.messages.push({ role: 'user', content: text, bubbleBg: appState.userBubbleBg });
+    chat.messages.push({ 
+      role: 'user', 
+      content: text, 
+      bubbleBg: appState.userBubbleBg,
+      replyTo: replyTextPayload
+    });
     chat.lastUpdated = Date.now(); 
     saveCurrentAccountData();
     renderChatHistory(chat);
