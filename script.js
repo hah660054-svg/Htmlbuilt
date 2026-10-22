@@ -30,17 +30,23 @@ window.syncUserProfileToCloud = async function(uid, name, username, pic, bio, ph
   } catch(e) {}
 };
 
+// ပြဿနာဖြေရှင်းထားသော Search Function (@ ပါသည်ဖြစ်စေ၊ အကြီး/အသေးဖြစ်စေ ရှာတွေ့နိုင်သည်)
 window.searchCloudUsers = async function(keyword, callback) {
   try {
     const snap = await getDocs(collection(db, "users"));
     let res = [];
+    let kw = keyword.toLowerCase().trim().replace('@', '');
+    if (!kw) { callback([]); return; }
+
     snap.forEach(d => {
       let u = d.data();
       if (u.uid !== (window.firebaseUserUid || currentUid)) {
-        let kw = keyword.toLowerCase();
-        if ((u.name && u.name.toLowerCase().includes(kw)) || (u.username && u.username.toLowerCase().includes(kw))) {
+        let uName = (u.name || '').toLowerCase();
+        let uUsername = (u.username || '').toLowerCase().replace('@', '');
+        
+        if (uName.includes(kw) || uUsername.includes(kw)) {
           res.push({ ...u, matchType: 'exact' });
-        } else if (u.name && (u.name.toLowerCase().startsWith(kw[0]) || u.username.toLowerCase().includes(kw[0]))) {
+        } else if (uName.startsWith(kw[0]) || uUsername.startsWith(kw[0])) {
           res.push({ ...u, matchType: 'similar' });
         }
       }
@@ -399,7 +405,22 @@ window.openChatRoom = function(chatId) {
   activeScreenHistory.push('chatRoomScreen');
 };
 
-// =================== CHAT HISTORY & INTERACTION SYSTEM ===================
+// --- MAPPING LINKS & USERNAMES IN CHAT MESSAGES ---
+function formatMessageText(text) {
+  if (!text) return '';
+  let formatted = text.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" style="color: #5288c1; text-decoration: underline;">$1</a>');
+  formatted = formatted.replace(/@([a-zA-Z0-9_]+)/g, '<span onclick="clickUsernameLink(\'@$1\')" style="color: #5288c1; cursor: pointer; font-weight: bold;">@$1</span>');
+  return formatted;
+}
+
+window.clickUsernameLink = function(username) {
+  window.openSearchScreen();
+  let searchInput = document.getElementById('searchInput');
+  if (searchInput) {
+    searchInput.value = username;
+    if (window.searchUsersAndGroups) window.searchUsersAndGroups(username);
+  }
+};
 
 function renderChatHistory(chat) {
   const box = document.getElementById('chatHistoryBox');
@@ -419,35 +440,30 @@ function renderChatHistory(chat) {
     }
 
     let contentHtml = '';
-    // စာထောက်ထားပါက ထောက်ထားသည့် စာတိုလေး ပေါ်ရန်
     if (m.replyTo) {
-      contentHtml += `<div class="reply-preview-box" style="background:rgba(0,0,0,0.2); padding:4px 8px; border-left:3px solid #5288c1; border-radius:4px; margin-bottom:5px; font-size:12px; color:#ddd;">${m.replyTo}</div>`;
+      contentHtml += `<div style="background:rgba(0,0,0,0.2); padding:4px 8px; border-left:3px solid #5288c1; border-radius:4px; margin-bottom:5px; font-size:12px; color:#ddd;">${formatMessageText(m.replyTo)}</div>`;
     }
     if (m.isLive) contentHtml += `<span class="live-photo-badge">🌟 Live Photo (Animation)</span><br>`;
     
     if (m.content.startsWith('img:')) {
       contentHtml += `<img src="${m.content.substring(4)}" style="max-width:100%; border-radius:10px; margin-top:4px;">`;
     } else {
-      contentHtml += m.content.replace(/\n/g, '<br>');
+      contentHtml += formatMessageText(m.content).replace(/\n/g, '<br>');
     }
 
-    // Reaction တံဆိပ်လေးများ ပြသရန်
     if (m.reactions && m.reactions.length > 0) {
-      contentHtml += `<div class="reaction-tag-container" style="display:flex; gap:2px; margin-top:4px;">${m.reactions.map(r => `<span style="font-size:12px; background:rgba(0,0,0,0.3); border-radius:8px; padding:1px 4px;">${r}</span>`).join('')}</div>`;
+      contentHtml += `<div style="display:flex; gap:2px; margin-top:4px;">${m.reactions.map(r => `<span style="font-size:12px; background:rgba(0,0,0,0.3); border-radius:8px; padding:1px 4px;">${r}</span>`).join('')}</div>`;
     }
 
     d.innerHTML = contentHtml;
     row.appendChild(d);
 
-    // --- SWIPE TO REPLY & LONG PRESS & CLICK EVENTS ---
     let startX = 0, currentX = 0, isDragging = false, pressTimer = null;
 
-    // Touch Start (ဖိနှိပ်ခြင်း သို့မဟုတ် Swipe စတင်ခြင်း)
     row.addEventListener('touchstart', (e) => {
       startX = e.touches[0].clientX;
       isDragging = true;
       pressTimer = setTimeout(() => {
-        // Long Press: Select Mode ဖွင့်ခြင်း
         if (isDragging) {
           appState.isSelectMode = true;
           toggleMessageSelection(idx);
@@ -456,7 +472,6 @@ function renderChatHistory(chat) {
       }, 500);
     }, { passive: true });
 
-    // Touch Move (ဘေးသို့ ဆွဲရွှေ့ခြင်း - Swipe Right to Reply)
     row.addEventListener('touchmove', (e) => {
       currentX = e.touches[0].clientX;
       let diffX = currentX - startX;
@@ -466,21 +481,21 @@ function renderChatHistory(chat) {
       }
     }, { passive: true });
 
-    // Touch End (လက်လွှတ်လိုက်သည့်အခါ)
     row.addEventListener('touchend', (e) => {
       clearTimeout(pressTimer);
       let diffX = currentX - startX;
       row.style.transform = `translateX(0px)`;
       if (diffX > 50 && isDragging) {
-        // Swipe အောင်မြင်ပါက Reply ထောက်မည်
         setReplyMessage(m.content);
       }
       isDragging = false;
       startX = 0; currentX = 0;
     });
 
-    // Click Event (တစ်ချက်နှိပ်ပါက Action Menu ပေါ်ရန်)
     row.onclick = (e) => {
+      // Link သို့မဟုတ် Username နှိပ်လိုက်ရင် context menu မပေါ်စေရန် တားမြစ်ခြင်း
+      if (e.target.tagName === 'A' || e.target.tagName === 'SPAN' && e.target.style.cursor === 'pointer') return;
+      
       if (appState.isSelectMode) {
         toggleMessageSelection(idx);
       } else {
@@ -493,7 +508,6 @@ function renderChatHistory(chat) {
   box.scrollTop = box.scrollHeight;
 }
 
-// --- REPLY UI CONTROLLER ---
 function setReplyMessage(text) {
   appState.replyingMessage = text;
   let replyBar = document.getElementById('chatReplyBar');
@@ -512,7 +526,6 @@ window.cancelReply = function() {
   if (replyBar) replyBar.remove();
 };
 
-// --- CLICK CONTEXT MENU (Reactions, Delete, Bubble Style) ---
 function openMessageContextMenu(msg, index) {
   let isUser = msg.role === 'user';
   let existingModal = document.getElementById('msgActionModal');
@@ -525,7 +538,6 @@ function openMessageContextMenu(msg, index) {
 
   modal.innerHTML = `
     <div class="modal-content" style="text-align:center;">
-      <!-- Reaction အတန်း -->
       <div style="display:flex; justify-content:space-around; font-size:24px; background:#141517; padding:10px; border-radius:15px; margin-bottom:15px;">
         <span onclick="addReaction(${index}, '❤️')" style="cursor:pointer;">❤️</span>
         <span onclick="addReaction(${index}, '👍')" style="cursor:pointer;">👍</span>
@@ -536,7 +548,6 @@ function openMessageContextMenu(msg, index) {
       </div>
 
       ${isUser ? `
-      <!-- ကိုယ်ပို့သည့်စာ ဖြစ်ပါက Bubble Color ပြောင်းရန် Option -->
       <div style="margin-bottom:12px; text-align:left;">
         <div style="font-size:12px; color:#8e9297; margin-bottom:6px;">နောက်ပို့မည့် စာများ၏ Bubble စတိုင် အရောင်ပြောင်းရန်:</div>
         <div style="display:flex; gap:10px;">
@@ -581,7 +592,6 @@ window.deleteSingleMessage = function(index) {
   closeActionModal();
 };
 
-// --- MULTI-SELECT & FORWARD / DELETE SYSTEM ---
 function toggleMessageSelection(index) {
   let pos = appState.selectedMsgIndices.indexOf(index);
   if (pos > -1) {
@@ -672,8 +682,6 @@ window.forwardSelectedMessages = function() {
   }
 };
 
-// =========================================================================
-
 window.openChatInfoModal = function() {
   let chat = appState.chats.find(c => c.id === appState.currentChatId);
   if (!chat) return;
@@ -707,10 +715,10 @@ window.openChatInfoModal = function() {
 window.inviteToGroup = function(name) {
   let chat = appState.chats.find(c => c.id === appState.currentChatId);
   if (chat) {
-    chat.messages.push({ role: 'model', content: `ℹ️ ${name} ကို Group ထဲသို့ ဖိတ်ကြားလိုက်ပါပြီ။ (စာထောက်မှသာ ပြန်ပါမည်)` });
+    chat.messages.push({ role: 'model', content: `ℹ️ ${name} ကို Group ထဲသို့ ဖိတ်ကြားလိုက်ပါပြီ။` });
     saveCurrentAccountData();
     renderChatHistory(chat);
-    alert(`${name} ကို Group သို့ ဝင်ရောက်လာစေရန် ဖိတ်ကြားပြီးပါပြီ။`);
+    alert(`${name} ကို Group သို့ ဖိတ်ကြားပြီးပါပြီ။`);
   }
   closeModal('chatInfoModal');
 };
@@ -775,7 +783,7 @@ window.sendMessage = async function() {
   input.value = '';
 
   let replyTextPayload = appState.replyingMessage;
-  cancelReply(); // Send ပီးပါက Reply Bar ကို ပြန်ပိတ်မည်
+  cancelReply();
 
   if (chat.type === 'p2p') {
     window.sendP2PMessageToFirestore(chat.id, text, appState.userBubbleBg, replyTextPayload);
